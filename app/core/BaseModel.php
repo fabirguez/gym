@@ -79,8 +79,8 @@ abstract class BaseModel
         return $query;
     }
 
-    public function setLog($user_id, $action, $description)
-    {
-        $this->db->query("CALL log($user_id, '$action', '$description')");
-    }
+    // public function setLog($user_id, $action, $description)
+    // {
+    //     $this->db->query("CALL log($user_id, '$action', '$description')");
+    // }
 }
