@@ -348,4 +348,60 @@ class UserModel extends BaseModel
 
         return $return;
     }
+
+    public function existeEmail($email)
+    {
+        $errores = [];
+        if ($email) {
+            try {
+                $query = $this->getBy('email', $email);
+
+                //Supervisamos que la consulta se realizó correctamente...
+                if ($query) {
+                    $errores['email'] = 'El correo ya existe';
+                } // o no :(
+            } catch (PDOException $ex) {
+                $errores['error'] = $ex->getMessage();
+                //die();
+            }
+        }
+
+        return $errores;
+    }
+
+    public function filtraDatos($filtra)
+    {
+        $errores = [];
+
+        if (!preg_match('^[0-9]{8,8}[A-Za-z]$/', $filtra['nif'])) {
+            $errores['DNI'] = 'Introduce un DNI correcto.';
+        }
+        if (!filter_var($filtra['email'], FILTER_VALIDATE_EMAIL)) {
+            $errores['email'] = 'Introduce un email correcto.';
+        }
+        if (!preg_match('^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,16}$/', $filtra['password'])) {
+            $errores['password'] = 'Introduce una contraseña con al menos un dígito, una minúscula, una mayúscula y un caracter no alfanumérico.';
+        }
+        if (!preg_match('^[679]{1}\d{8}$/', $filtra['telefono'])) {
+            $errores['telefono'] = 'Introduce un telefono válido español.';
+        }
+
+        return $errores;
+    }
+
+    public function comparaPassword($password, $password2)
+    {
+        $errores = [];
+
+        try {
+            if ($password != $password2) {
+                $errores['email'] = 'Las contraseñas no coinciden';
+            } // o no :(
+        } catch (PDOException $ex) {
+            $errores['error'] = $ex->getMessage();
+            //die();
+        }
+
+        return $errores;
+    }
 }
