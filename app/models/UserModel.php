@@ -373,16 +373,16 @@ class UserModel extends BaseModel
     {
         $errores = [];
 
-        if (!preg_match('^[0-9]{8,8}[A-Za-z]$/', $filtra['nif'])) {
+        if (!preg_match('/^[0-9]{8,8}[A-Za-z]$/', $filtra['nif'])) {
             $errores['DNI'] = 'Introduce un DNI correcto.';
         }
         if (!filter_var($filtra['email'], FILTER_VALIDATE_EMAIL)) {
             $errores['email'] = 'Introduce un email correcto.';
         }
-        if (!preg_match('^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,16}$/', $filtra['password'])) {
+        if (!preg_match('/^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,16}$/', $filtra['password'])) {
             $errores['password'] = 'Introduce una contraseña con al menos un dígito, una minúscula, una mayúscula y un caracter no alfanumérico.';
         }
-        if (!preg_match('^[679]{1}\d{8}$/', $filtra['telefono'])) {
+        if (!preg_match('/^[679]{1}\d{8}$/', $filtra['telefono'])) {
             $errores['telefono'] = 'Introduce un telefono válido español.';
         }
 

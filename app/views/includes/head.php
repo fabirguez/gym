@@ -106,7 +106,7 @@ if (isset($_SESSION['email'])) {
                     <a class="nav-link" href="?controller=index&accion=login">Iniciar Sesion</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="verano.html">Registrarse</a>
+                    <a class="nav-link" href="?controller=index&accion=register">Registrarse</a>
                 </li>
                 <?php } ?>
             </ul>

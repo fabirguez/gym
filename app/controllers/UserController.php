@@ -107,13 +107,13 @@ class UserController extends BaseController
         // Si se ha pulsado el botón guardar...
       if (isset($_POST) && !empty($_POST) && isset($_POST['submit'])) { // y hemos recibido las variables del formulario y éstas no están vacías...
         $nombre = filter_var($_POST['txtnombre'], FILTER_SANITIZE_STRING);
-          $nif = filter_var($_POST[txtnif], FILTER_SANITIZE_STRING);
-          $apellidos = filter_var($_POST[txtapellidos], FILTER_SANITIZE_STRING);
-          $email = filter_var($_POST[txtemail], FILTER_SANITIZE_STRING);
-          $password = filter_var($_POST[txtpassword], FILTER_SANITIZE_STRING);
-          $password2 = filter_var($_POST[txtpassword2], FILTER_SANITIZE_STRING);
-          $telefono = filter_var($_POST[txttelefono], FILTER_SANITIZE_STRING);
-          $direccion = filter_var($_POST[txtdireccion], FILTER_SANITIZE_STRING);
+          $nif = filter_var($_POST['txtnif'], FILTER_SANITIZE_STRING);
+          $apellidos = filter_var($_POST['txtapellidos'], FILTER_SANITIZE_STRING);
+          $email = filter_var($_POST['txtemail'], FILTER_SANITIZE_STRING);
+          $password = filter_var($_POST['txtpassword'], FILTER_SANITIZE_STRING);
+          $password2 = filter_var($_POST['txtpassword2'], FILTER_SANITIZE_STRING);
+          $telefono = filter_var($_POST['txttelefono'], FILTER_SANITIZE_STRING);
+          $direccion = filter_var($_POST['txtdireccion'], FILTER_SANITIZE_STRING);
           $imagen = '-';
           $filtrardatos = [
             'nif' => $nif,
@@ -122,7 +122,7 @@ class UserController extends BaseController
             'telefono' => $telefono,
         ];
 
-          $errores = $this->modelo->filtraDatos($filtra);
+          $errores = $this->modelo->filtraDatos($filtrardatos);
 
           $errores = $this->modelo->existeEmail($email);
           $errores = $this->modelo->comparaPassword($password, $password2);

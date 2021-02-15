@@ -14,6 +14,7 @@ class IndexController extends BaseController
     {
         parent::__construct();
         $this->modelo = new UserModel();
+        $this->mensajes = [];
     }
 
     public function index()
@@ -106,6 +107,90 @@ class IndexController extends BaseController
      */
     public function register()
     {
+        $parametros = [
+            'tituloventana' => 'Registro de usuario',
+            'datos' => null,
+            'mensajes' => [],
+         ];
+        // Array asociativo que almacenará los mensajes de error que se generen por cada campo
+        $errores = [];
+        // Si se ha pulsado el botón guardar...
+        if (isset($_POST['txtnombre']) && isset($_POST['txtnif']) && isset($_POST['txtapellidos'])
+      && isset($_POST['txtemail']) && isset($_POST['txtpassword']) && isset($_POST['txtpassword2'])
+      && isset($_POST['txttelefono']) && isset($_POST['txtdireccion'])) { // y hemos recibido las variables del formulario y éstas no están vacías...
+            $nombre = filter_var($_POST['txtnombre'], FILTER_SANITIZE_STRING);
+            $nif = filter_var($_POST['txtnif'], FILTER_SANITIZE_STRING);
+            $apellidos = filter_var($_POST['txtapellidos'], FILTER_SANITIZE_STRING);
+            $email = filter_var($_POST['txtemail'], FILTER_SANITIZE_STRING);
+            $password = filter_var($_POST['txtpassword'], FILTER_SANITIZE_STRING);
+            $password2 = filter_var($_POST['txtpassword2'], FILTER_SANITIZE_STRING);
+            $telefono = filter_var($_POST['txttelefono'], FILTER_SANITIZE_STRING);
+            $direccion = filter_var($_POST['txtdireccion'], FILTER_SANITIZE_STRING);
+            $imagen = '-';
+            $estado = 0;
+            $rol_id = 2;
+            $filtrardatos = [
+            'nif' => $nif,
+            'email' => $email,
+            'password' => $password,
+            'telefono' => $telefono,
+        ];
+
+            $errores = $this->modelo->filtraDatos($filtrardatos);
+
+            $errores = $this->modelo->existeEmail($email);
+            $errores = $this->modelo->comparaPassword($password, $password2);
+
+            if (count($errores) == 0) {
+                $resultModelo = $this->modelo->adduser([
+             'nif' => $nif,
+             'nombre' => $nombre,
+             'apellidos' => $apellidos,
+              'email' => $email,
+              'password' => $password,
+              'telefono' => $telefono,
+              'direccion' => $direccion,
+              'estado' => $estado,
+              'imagen' => $imagen,
+              'rol_id' => $rol_id,
+          ]);
+                if ($resultModelo['correcto']) :
+             $this->mensajes[] = [
+                'tipo' => 'success',
+                'mensaje' => 'El usuarios se registró correctamente!! :)',
+             ]; else :
+             $this->mensajes[] = [
+                'tipo' => 'danger',
+                'mensaje' => "El usuario no pudo registrarse!! :( <br />({$resultModelo['error']})",
+             ];
+                endif;
+            } else {
+                $this->mensajes[] = [
+             'tipo' => 'danger',
+             'mensaje' => 'Datos de registro de usuario erróneos!! :(',
+          ];
+            }
+        }
+
+        $parametros = [
+       'tituloventana' => 'Registro de usuario',
+       'datos' => [
+          'txtnombre' => isset($nombre) ? $nombre : '',
+          'txtnif' => isset($nif) ? $nif : '',
+             'txtnombre' => isset($nombre) ? $nombre : '',
+             'txtapellidos' => isset($apellidos) ? $apellidos : '',
+              'txtemail' => isset($email) ? $email : '',
+              'txtpassword' => isset($password) ? $password : '',
+              'txttelefono' => isset($telefono) ? $telefono : '',
+              'txtdireccion' => isset($direccion) ? $direccion : '',
+              'txtestado' => isset($estado) ? $estado : 3,
+              'imagen' => isset($imagen) ? $imagen : '',
+              'rol_id' => isset($rol_id) ? $rol_id : 0,
+       ],
+       'mensajes' => $this->mensajes,
+    ];
+        //Visualizamos la vista asociada al registro de usuarios
+        $this->view->show('Register', $parametros);
     }
 
     /*

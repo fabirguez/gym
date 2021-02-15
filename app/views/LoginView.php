@@ -18,7 +18,7 @@
                <input type="text" class="form-control" name="txtemail" ></label>
             <br />
             
-            <label for="txtpass">Contraseña
+            <label for="txtpassword">Contraseña
                <input type="password" class="form-control" name="txtpassword" ></label>
             <br />
             
