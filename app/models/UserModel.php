@@ -353,18 +353,6 @@ class UserModel extends BaseModel
     {
         $errores = [];
         if ($email) {
-            // try {
-            //     $query = $this->getBy('email', $email);
-
-            //     //Supervisamos que la consulta se realizó correctamente...
-            //     if ($query) {
-            //         $errores['email'] = 'El correo ya existe';
-            //     } // o no :(
-            // } catch (PDOException $ex) {
-            //     $errores['error'] = $ex->getMessage();
-            //     //die();
-            // }
-
             try {
                 $sql = 'SELECT count(*) as total FROM usuarios WHERE email=:email';
                 $query = $this->db->prepare($sql);
@@ -422,19 +410,28 @@ class UserModel extends BaseModel
 
     public function tryLogin($email, $password)
     {
-        $error = 0;
-        $sql = "SELECT * FROM usuarios WHERE email='".$email."' AND password = '".$password."'";
-        $query = $this->db->prepare($sql);
-        $query->execute(['email' => $email,
+        $return = [
+            'correcto' => false,
+            'datos' => null,
+            'error' => null,
+         ];
+
+        try {
+            $sql = "SELECT * FROM usuarios WHERE email='".$email."' AND password = '".$password."'";
+            $query = $this->db->prepare($sql);
+            $query->execute(['email' => $email,
                                 'password' => $password, ]);
 
-        // $consulta =
-        // $result = $db->query($consulta);
-        if (!$query) {
-            $error = 1;
+            if ($query->rowCount() > 0) {
+                $return['datos'] = $query->fetch(PDO::FETCH_ASSOC);
+                $return['correcto'] = true;
+            } // o no :(
+        } catch (PDOException $ex) {
+            $return['error'] = $ex->getMessage();
+            //die();
         }
 
-        return $error;
+        return $return;
     }
 
     public function rolEmail($email)

@@ -54,11 +54,10 @@ if (isset($_SESSION['email'])) {
     // $userController = new UserController();
     $tipoUser = $_SESSION['rol_id'];
 
-    if ($tipoUser == '2') {
-        $rol_id = 2;
-    }
     if ($tipoUser == '1') {
         $rol_id = 1;
+    } elseif ($tipoUser == '0') {
+        $rol_id = 0;
     }
 }
 ?>
@@ -76,7 +75,7 @@ if (isset($_SESSION['email'])) {
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-            <?php if ($rol_id == 1) { ?>
+            <?php if ($rol_id == 0) { ?>
                 <li class="nav-item">
                     <a class="nav-link" href="verano.html">Actividades</a>
                 </li>
@@ -90,18 +89,21 @@ if (isset($_SESSION['email'])) {
                     <a class="nav-link" href="verano.html">Usuarios</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="verano.html">Cerrar Sesion</a>
+                    <a class="nav-link" href="?controller=index&accion=logout">Cerrar Sesion</a>
                 </li>
                 <?php } ?>
-                <?php if ($rol_id == 2) { ?>
+                <?php if ($rol_id == 1) { ?>
                 <li class="nav-item">
                     <a class="nav-link" href="primavera.html">Horario</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="verano.html">Perfil</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="?controller=index&accion=logout">Cerrar Sesion</a>
+                </li>
                 <?php } ?>
-                <?php if ($rol_id == 0 || $rol_id > 2) { ?>
+                <?php if ($rol_id > 1) { ?>
                 <li class="nav-item">
                     <a class="nav-link" href="?controller=index&accion=login">Iniciar Sesion</a>
                 </li>

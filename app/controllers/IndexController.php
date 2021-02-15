@@ -39,22 +39,26 @@ class IndexController extends BaseController
             'mensajes' => [],
          ];
 
+        $errores = [];
+
         if (isset($_POST['txtemail']) && isset($_POST['txtpassword'])) {
             // $u = new UserModel();
-            $errores['try login'] = $this->modelo->tryLogin($_POST['txtemail'], $_POST['txtpassword']);
-            if (count($errores) == 0) {
+            $tryLogin = $this->modelo->tryLogin($_POST['txtemail'], sha1($_POST['txtpassword']));
+
+            if ($tryLogin['correcto'] == true) {
                 $this->mensajes[] = [
                 'tipo' => 'success',
                 'mensaje' => 'Login correcto',
              ];
                 $esActivo = $this->modelo->esActivo($_POST['txtemail']);
-                if ($esActivo['correcto']) {
+                // if ($esActivo['correcto']) {
+                if ($tryLogin['datos']['estado'] == 1) {
                     session_start();
                     $_SESSION['email'] = $_POST['txtemail'];
                     $parametros['email'] = $_POST['txtemail'];
 
-                    $rol_id = $this->modelo->rolEmail($_POST['txtemail']);
-                    $rol_id = $rol_id['datos'];
+                    // $rol_id = $this->modelo->rolEmail($_SESSION['email']);   //de esta forma no funciona
+                    $rol_id = $tryLogin['datos']['rol_id'];
                     $_SESSION['rol_id'] = $rol_id;
                     $parametros['rol_id'] = $rol_id;
 
@@ -74,19 +78,34 @@ class IndexController extends BaseController
                     //         setcookie('mantieneSesion', '');
                     //     }
                     // }
+                    $parametros['mensajes'] = $this->mensajes;
                     $this->view->show('Inicio', $parametros);
                 } else {
+                    // foreach ($errores as $e) {
+                    //     $this->mensajes[] = [
+                    //         'tipo' => 'danger',
+                    //         'mensaje' => $e,
+                    //      ];
+                    // }
                     $this->mensajes[] = [
                         'tipo' => 'danger',
                         'mensaje' => 'El usuario debe activarlo un administrador. Contacte con la empresa',
                      ];
+                    $parametros['mensajes'] = $this->mensajes;
                     $this->view->show('Login', $parametros);
                 }
             } else {
+                // foreach ($errores as $e) {
+                //     $this->mensajes[] = [
+                //         'tipo' => 'danger',
+                //         'mensaje' => $e,
+                //      ];
+                // }
                 $this->mensajes[] = [
-                'tipo' => 'danger',
-                'mensaje' => 'Usuario y contraseña no coinciden o no existe!! :( ',
-             ];
+                    'tipo' => 'danger',
+                    'mensaje' => 'Usuario y contraseña no coinciden o no existe!! :( ',
+                 ];
+                $parametros['mensajes'] = $this->mensajes;
                 $this->view->show('Login', $parametros);
             }
         } else {
@@ -95,6 +114,9 @@ class IndexController extends BaseController
                 'tipo' => 'danger',
                 'mensaje' => 'Usuario y o contraseña vacios!! :( ',
              ];
+
+            ///MIRARRRR!!!!
+            $parametros['mensajes'] = $this->mensajes;
             $this->view->show('Login', $parametros);
         }
     }
@@ -139,6 +161,9 @@ class IndexController extends BaseController
 
             $errores += $this->modelo->existeEmail($_POST['txtemail']);
             $errores += $this->modelo->comparaPassword($password, $password2);
+
+            $password = sha1($password);
+            $password2 = sha1($password2);
 
             if (count($errores) == 0) {
                 $resultModelo = $this->modelo->adduser([
@@ -197,4 +222,17 @@ class IndexController extends BaseController
     /*
      * Otras acciones que puedan ser necesarias
      */
+
+    public function logout()
+    {
+        $parametros = [
+            'tituloventana' => 'Logout',
+            'datos' => null,
+            'mensajes' => [],
+         ];
+        session_start();
+        session_unset();
+        session_destroy();
+        $this->view->show('Index', $parametros);
+    }
 }
