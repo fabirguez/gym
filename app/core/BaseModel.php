@@ -17,7 +17,7 @@ abstract class BaseModel
      */
     public function __construct()
     {
-        $this->db = DBManager::getInstance()->getConnection();
+        $this->db = DB::getInstance()->getConnection();
     }
 
     /**

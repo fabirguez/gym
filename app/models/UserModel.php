@@ -404,4 +404,73 @@ class UserModel extends BaseModel
 
         return $errores;
     }
+
+    public function tryLogin($email, $password)
+    {
+        $errores = [];
+        $sql = "SELECT * FROM usuarios WHERE email='".$email."' AND password = '".$password."'";
+        $query = $this->db->prepare($sql);
+        $query->execute(['email' => $email,
+                                'password' => $password, ]);
+
+        // $consulta =
+        // $result = $db->query($consulta);
+        if (!$query) {
+            $errores['existe'] = 'No encuentra el user o no coincide con la contraseña';
+        }
+
+        return $errores;
+    }
+
+    public function rolEmail($email)
+    {
+        $return = [
+            'correcto' => false,
+            'datos' => null,
+            'error' => null,
+         ];
+
+        $sql = "SELECT rol_id FROM usuarios WHERE email='".$email."'";
+        $query = $this->db->prepare($sql);
+        $query->execute(['email' => $email]);
+        $query->fetch(PDO::FETCH_ASSOC);
+
+        try {
+            if ($query) {
+                $return['correcto'] = true;
+                $return['datos'] = $query->fetch(PDO::FETCH_ASSOC);
+            } // o no :(
+        } catch (PDOException $ex) {
+            $return['error'] = $ex->getMessage();
+            //die();
+        }
+
+        return $return;
+    }
+
+    public function esActivo($email)
+    {
+        $return = [
+            'correcto' => false,
+            'datos' => null,
+            'error' => null,
+         ];
+
+        $sql = "SELECT estado FROM usuarios WHERE email='".$email."'";
+        $query = $this->db->prepare($sql);
+        $query->execute(['email' => $email]);
+        $query->fetch(PDO::FETCH_ASSOC);
+
+        try {
+            if ($query) {
+                $return['correcto'] = true;
+                $return['datos'] = $query->fetch(PDO::FETCH_ASSOC);
+            } // o no :(
+        } catch (PDOException $ex) {
+            $return['error'] = $ex->getMessage();
+            //die();
+        }
+
+        return $return;
+    }
 }

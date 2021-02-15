@@ -49,15 +49,15 @@
 require_once CONTROLLERS_FOLDER.'UserController.php';
 $logged = false;
 $rol_id = 3; //unregistered
-if (isset($_SESSION['userID'])) {
+if (isset($_SESSION['email'])) {
     $logged = true;
-    $userController = new UsuarioController();
-    $tipoUser = $userController->getUserByEmail($_SESSION['userID'])['tipoUsuario'];
+    // $userController = new UserController();
+    $tipoUser = $_SESSION['rol_id'];
 
-    if ($tipoUser == 'usuario') {
+    if ($tipoUser == '2') {
         $rol_id = 2;
     }
-    if ($tipoUser == 'admin') {
+    if ($tipoUser == '1') {
         $rol_id = 1;
     }
 }
@@ -103,7 +103,7 @@ if (isset($_SESSION['userID'])) {
                 <?php } ?>
                 <?php if ($rol_id == 0 || $rol_id > 2) { ?>
                 <li class="nav-item">
-                    <a class="nav-link" href="primavera.html">Iniciar Sesion</a>
+                    <a class="nav-link" href="?controller=index&accion=login">Iniciar Sesion</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="verano.html">Registrarse</a>

@@ -2,41 +2,30 @@
      require_once 'includes/head.php';
     ?>
 
-	
-	<div class="limiter">
-		<div class="container-login100" style="background-image: url('');">
-			<div class="wrap-login100 p-t-30 p-b-50">
-				<span class="login100-form-title p-b-41">
-					Account Login
-				</span>
-				<form class="login100-form validate-form p-b-33 p-t-5">
+   <div class="centrar">
+      <div class="container centrar">
+         
+         <div class="container cuerpo text-center centrar">
+            <p>
+               <h2>Login</h2>
+            </p>
+         </div>
+         <?php foreach ($mensajes as $mensaje) : ?>
+            <div class="alert alert-<?= $mensaje['tipo']; ?>"><?= $mensaje['mensaje']; ?></div>
+         <?php endforeach; ?>
+         <form action="?controller=index&accion=login" method="post" enctype="multipart/form-data">
+            <label for="txtemail">Email
+               <input type="text" class="form-control" name="txtemail" ></label>
+            <br />
+            
+            <label for="txtpass">Contraseña
+               <input type="password" class="form-control" name="txtpassword" ></label>
+            <br />
+            
+            <input type="submit" value="Guardar" name="submit" class="btn btn-success">
+         </form>
+      </div>
 
-					<div class="wrap-input100 validate-input" data-validate = "Enter username">
-						<input class="input100" type="text" name="username" placeholder="User name">
-						<span class="focus-input100" data-placeholder="&#xe82a;"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate="Enter password">
-						<input class="input100" type="password" name="pass" placeholder="Password">
-						<span class="focus-input100" data-placeholder="&#xe80f;"></span>
-					</div>
-
-					<div class="container-login100-form-btn m-t-32">
-						<button class="login100-form-btn">
-							Login
-						</button>
-					</div>
-
-				</form>
-			</div>
-		</div>
-	</div>
-	
-
-	<div id="dropDownSelect1"></div>
-	
-
-
-    <?php
-     require_once 'includes/tail.php';
-    ?>
+<?php
+require_once 'includes/tail.php';
+?>
