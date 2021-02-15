@@ -14,28 +14,28 @@
          <?php endforeach; ?>
          <form action="?controller=index&accion=register" method="post" enctype="multipart/form-data">
          <label for="txtnif">Nif
-               <input type="text" class="form-control" name="txtnif" ></label>
+               <input type="text" class="form-control" name="txtnif" required></label>
             <br />
             <label for="txtnombre">Nombre
-               <input type="text" class="form-control" name="txtnombre" ></label>
+               <input type="text" class="form-control" name="txtnombre" required></label>
             <br />
             <label for="txtapellidos">Apellidos
-               <input type="email" class="form-control" name="txtapellidos" ></label>
+               <input type="text" class="form-control" name="txtapellidos" required></label>
             <br />
             <label for="txtpassword">Contraseña
-               <input type="password" class="form-control" name="txtpassword" ></label>
+               <input type="password" class="form-control" name="txtpassword" required></label>
             <br />
             <label for="txtpassword2">Repetir contraseña
-               <input type="password" class="form-control" name="txtpassword2" ></label>
+               <input type="password" class="form-control" name="txtpassword2" required></label>
             <br />
             <label for="txtemail">Email
-               <input type="text" class="form-control" name="txtemail" ></label>
+               <input type="email" class="form-control" name="txtemail"required ></label>
             <br />
             <label for="txtdireccion">Direccion
-               <input type="email" class="form-control" name="txtdireccion" ></label>
+               <input type="text" class="form-control" name="txtdireccion" required></label>
             <br />
             <label for="txttelefono">Telefono
-               <input type="text" class="form-control" name="txttelefono" ></label>
+               <input type="text" class="form-control" name="txttelefono" required></label>
             <br />
             
             

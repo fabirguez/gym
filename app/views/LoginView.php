@@ -7,7 +7,7 @@
          
          <div class="container cuerpo text-center centrar">
             <p>
-               <h2>Login</h2>
+               <h2>Logear Usuario</h2>
             </p>
          </div>
          <?php foreach ($mensajes as $mensaje) : ?>

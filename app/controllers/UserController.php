@@ -115,6 +115,8 @@ class UserController extends BaseController
           $telefono = filter_var($_POST['txttelefono'], FILTER_SANITIZE_STRING);
           $direccion = filter_var($_POST['txtdireccion'], FILTER_SANITIZE_STRING);
           $imagen = '-';
+          $estado = 0;
+          $rol_id = 1;
           $filtrardatos = [
             'nif' => $nif,
             'email' => $email,

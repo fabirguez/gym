@@ -259,16 +259,16 @@ class UserModel extends BaseModel
             $query = $this->db->prepare($sql);
             // y la ejecutamos indicando los valores que tendría cada parámetro
             $query->execute([
-                'nif' => $this->nif,
-                'nombre' => $this->nombre,
-                'apellidos' => $this->apellidos,
-                'email' => $this->email,
-                'password' => $this->password,
-                'telefono' => $this->telefono,
-                'direccion' => $this->direccion,
-                'estado' => $this->estado,
-                'imagen' => $this->imagen,
-                'rol_id' => $this->rol_id,
+                'nif' => $datos['nif'],
+                'nombre' => $datos['nombre'],
+                'apellidos' => $datos['apellidos'],
+                'email' => $datos['email'],
+                'password' => $datos['password'],
+                'telefono' => $datos['telefono'],
+                'direccion' => $datos['direccion'],
+                'estado' => $datos['estado'],
+                'imagen' => $datos['imagen'],
+                'rol_id' => $datos['rol_id'],
          ]); //Supervisamos si la inserción se realizó correctamente...
             if ($query) {
                 $this->db->commit(); // commit() confirma los cambios realizados durante la transacción
@@ -353,11 +353,26 @@ class UserModel extends BaseModel
     {
         $errores = [];
         if ($email) {
-            try {
-                $query = $this->getBy('email', $email);
+            // try {
+            //     $query = $this->getBy('email', $email);
 
-                //Supervisamos que la consulta se realizó correctamente...
-                if ($query) {
+            //     //Supervisamos que la consulta se realizó correctamente...
+            //     if ($query) {
+            //         $errores['email'] = 'El correo ya existe';
+            //     } // o no :(
+            // } catch (PDOException $ex) {
+            //     $errores['error'] = $ex->getMessage();
+            //     //die();
+            // }
+
+            try {
+                $sql = 'SELECT count(*) as total FROM usuarios WHERE email=:email';
+                $query = $this->db->prepare($sql);
+                $query->execute(['email' => $email]);
+                $query = $query->fetchAll(PDO::FETCH_ASSOC);
+                $total = $query[0]['total'];
+
+                if ($total > 0) {
                     $errores['email'] = 'El correo ya existe';
                 } // o no :(
             } catch (PDOException $ex) {
@@ -380,7 +395,7 @@ class UserModel extends BaseModel
             $errores['email'] = 'Introduce un email correcto.';
         }
         if (!preg_match('/^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,16}$/', $filtra['password'])) {
-            $errores['password'] = 'Introduce una contraseña con al menos un dígito, una minúscula, una mayúscula y un caracter no alfanumérico.';
+            $errores['password'] = 'Introduce una contraseña con al menos un dígito, una minúscula y una mayúscula.';
         }
         if (!preg_match('/^[679]{1}\d{8}$/', $filtra['telefono'])) {
             $errores['telefono'] = 'Introduce un telefono válido español.';
@@ -407,7 +422,7 @@ class UserModel extends BaseModel
 
     public function tryLogin($email, $password)
     {
-        $errores = [];
+        $error = 0;
         $sql = "SELECT * FROM usuarios WHERE email='".$email."' AND password = '".$password."'";
         $query = $this->db->prepare($sql);
         $query->execute(['email' => $email,
@@ -416,10 +431,10 @@ class UserModel extends BaseModel
         // $consulta =
         // $result = $db->query($consulta);
         if (!$query) {
-            $errores['existe'] = 'No encuentra el user o no coincide con la contraseña';
+            $error = 1;
         }
 
-        return $errores;
+        return $error;
     }
 
     public function rolEmail($email)
@@ -464,7 +479,6 @@ class UserModel extends BaseModel
         try {
             if ($query) {
                 $return['correcto'] = true;
-                $return['datos'] = $query->fetch(PDO::FETCH_ASSOC);
             } // o no :(
         } catch (PDOException $ex) {
             $return['error'] = $ex->getMessage();

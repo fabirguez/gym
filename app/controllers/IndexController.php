@@ -40,15 +40,15 @@ class IndexController extends BaseController
          ];
 
         if (isset($_POST['txtemail']) && isset($_POST['txtpassword'])) {
-            $u = new UserModel();
-            $errores = $this->modelo->tryLogin($_POST['txtemail'], $_POST['txtpassword']);
+            // $u = new UserModel();
+            $errores['try login'] = $this->modelo->tryLogin($_POST['txtemail'], $_POST['txtpassword']);
             if (count($errores) == 0) {
                 $this->mensajes[] = [
                 'tipo' => 'success',
                 'mensaje' => 'Login correcto',
              ];
                 $esActivo = $this->modelo->esActivo($_POST['txtemail']);
-                if ($esActivo['correcto'] && ($esActivo['datos'] == 1)) {
+                if ($esActivo['correcto']) {
                     session_start();
                     $_SESSION['email'] = $_POST['txtemail'];
                     $parametros['email'] = $_POST['txtemail'];
@@ -97,7 +97,6 @@ class IndexController extends BaseController
              ];
             $this->view->show('Login', $parametros);
         }
-        $this->view->show('Login', $parametros);
     }
 
     /**
@@ -128,7 +127,7 @@ class IndexController extends BaseController
             $direccion = filter_var($_POST['txtdireccion'], FILTER_SANITIZE_STRING);
             $imagen = '-';
             $estado = 0;
-            $rol_id = 2;
+            $rol_id = 1;
             $filtrardatos = [
             'nif' => $nif,
             'email' => $email,
@@ -138,8 +137,8 @@ class IndexController extends BaseController
 
             $errores = $this->modelo->filtraDatos($filtrardatos);
 
-            $errores = $this->modelo->existeEmail($email);
-            $errores = $this->modelo->comparaPassword($password, $password2);
+            $errores += $this->modelo->existeEmail($_POST['txtemail']);
+            $errores += $this->modelo->comparaPassword($password, $password2);
 
             if (count($errores) == 0) {
                 $resultModelo = $this->modelo->adduser([
@@ -165,10 +164,12 @@ class IndexController extends BaseController
              ];
                 endif;
             } else {
-                $this->mensajes[] = [
-             'tipo' => 'danger',
-             'mensaje' => 'Datos de registro de usuario erróneos!! :(',
-          ];
+                foreach ($errores as $e) {
+                    $this->mensajes[] = [
+                        'tipo' => 'danger',
+                        'mensaje' => $e,
+                     ];
+                }
             }
         }
 
