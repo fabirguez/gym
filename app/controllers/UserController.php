@@ -41,9 +41,26 @@ class UserController extends BaseController
          'tituloventana' => 'Listado de usuarios',
          'datos' => null,
          'mensajes' => [],
+         'numpaginas' => null,
+         'regsxpag' => null,
+         'totalregistros' => null,
       ];
+        $regsxpag = (isset($_GET['regsxpag'])) ? (int) $_GET['regsxpag'] : 5;
+        //Establecemos la página que vamos a mostrar, por página, por defecto la 1
+        $pagina = (isset($_GET['pagina'])) ? (int) $_GET['pagina'] : 1;
+        //Definimos la variable $offset que indique la posición del registro desde el que se
+        // mostrarán los registros de una página dentro de la paginación.
+        $offset = ($pagina > 1) ? (($pagina - 1) * $regsxpag) : 0;
+
+        $totalregistros = $this->modelo->cuentaUser();
+
+        //Determinamos el número de páginas de la que constará mi paginación
+        $numpaginas = ceil($totalregistros / $regsxpag);
         // Realizamos la consulta y almacenamos los resultados en la variable $resultModelo
-        $resultModelo = $this->modelo->listado();
+        $resultModelo = $this->modelo->listado($regsxpag, $offset);
+
+        // Realizamos la consulta y almacenamos los resultados en la variable $resultModelo
+        // $resultModelo = $this->modelo->listado();
         // Si la consulta se realizó correctamente transferimos los datos obtenidos
         // de la consulta del modelo ($resultModelo["datos"]) a nuestro array parámetros
         // ($parametros["datos"]), que será el que le pasaremos a la vista para visualizarlos
@@ -62,9 +79,18 @@ class UserController extends BaseController
         endif;
         //Asignamos al campo 'mensajes' del array de parámetros el valor del atributo
         //'mensaje', que recoge cómo finalizó la operación:
-        $parametros['mensajes'] = $this->mensajes;
+
+        $parametros = [
+            'tituloventana' => 'Listado de usuarios',
+            'datos' => $resultModelo['datos'],
+            'mensajes' => $this->mensajes,
+            'numpaginas' => $numpaginas,
+            'regsxpag' => $regsxpag,
+            'totalregistros' => $totalregistros,
+            'pagina' => $pagina,
+         ];
         // Incluimos la vista en la que visualizaremos los datos o un mensaje de error
-        $this->view->show('ListadoUser', $parametros);
+        $this->view->show('ListaUser', $parametros);
     }
 
     /**
@@ -126,8 +152,8 @@ class UserController extends BaseController
 
           $errores = $this->modelo->filtraDatos($filtrardatos);
 
-          $errores = $this->modelo->existeEmail($email);
-          $errores = $this->modelo->comparaPassword($password, $password2);
+          $errores += $this->modelo->existeEmail($email);
+          $errores += $this->modelo->comparaPassword($password, $password2);
 
           /* Realizamos la carga de la imagen en el servidor */
           //LA IMAGEN SE AÑADE DESPUES
@@ -258,7 +284,7 @@ class UserController extends BaseController
       ];
 
           $errores = $this->modelo->filtraDatos($filtra);
-          $errores = $this->modelo->comparaPassword($nuevopassword, $nuevopassword2);
+          $errores += $this->modelo->comparaPassword($nuevopassword, $nuevopassword2);
 
           // Definimos la variable $imagen que almacenará el nombre de imagen
           // que almacenará la Base de Datos inicializada a NULL
@@ -385,5 +411,68 @@ class UserController extends BaseController
       ];
         //Mostramos la vista actuser
         $this->view->show('ActUser', $parametros);
+    }
+
+    public function actFoto()
+    {
+        $imagen;
+
+        if (isset($_FILES['imagen']) && (!empty($_FILES['imagen']['tmp_name']))) {
+            if (!is_dir('assets/img/perfil')) {
+                $dir = mkdir('assets/img/perfil', 0777, true);
+            } else {
+                $dir = true;
+            }
+            // Ya verificado que la carpeta uploads existe movemos el fichero seleccionado a dicha carpeta
+            if ($dir) {
+                //Para asegurarnos que el nombre va a ser único...
+                $nombrefichimg = time().'-'.$_FILES['imagen']['name'];
+                // Movemos el fichero de la carpeta temportal a la nuestra
+                $movfichimg = move_uploaded_file($_FILES['imagen']['tmp_name'], 'assets/img/perfil'.$nombrefichimg);
+                $imagen = $nombrefichimg;
+                // Verficamos que la carga se ha realizado correctamente
+                if ($movfichimg) {
+                    $imagencargada = true;
+                } else {
+                    $imagencargada = false;
+                    $this->mensajes[] = [
+                   'tipo' => 'danger',
+                   'mensaje' => 'Error: La imagen no se cargó correctamente! :(',
+                ];
+                    $errores['imagen'] = 'Error: La imagen no se cargó correctamente! :(';
+                }
+            }
+        }
+        // Si no se han producido errores realizamos el registro del usuario
+        if (count($errores) == 0) {
+            $resultModelo = $this->modelo->actImg([
+               'imagen' => $imagen,
+            ]);
+            if ($resultModelo['correcto']) :
+                $this->mensajes[] = [
+                   'tipo' => 'success',
+                   'mensaje' => 'La foto se actualizó correctamente!! :)',
+                ]; else :
+                $this->mensajes[] = [
+                   'tipo' => 'danger',
+                   'mensaje' => "La foto no pudo actualizarse!! :( <br />({$resultModelo['error']})",
+                ];
+            endif;
+        }
+        // Obtenemos los valores para mostrarlos en los campos del formulario
+        $valimagen = $nuevaimagen;
+
+        //Preparamos un array con todos los valores que tendremos que rellenar en
+        //la vista actimg: título de la página y campos del formulario
+        $parametros = [
+        'tituloventana' => 'Actualiza imagen',
+        'datos' => [
+           'imagen' => $valimagen,
+        ],
+        'mensajes' => $this->mensajes,
+        'id' => $id,
+     ];
+        //Mostramos la vista actuser
+        $this->view->show('ActImg', $parametros);
     }
 }

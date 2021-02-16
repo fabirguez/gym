@@ -79,7 +79,7 @@ class IndexController extends BaseController
                     //     }
                     // }
                     $parametros['mensajes'] = $this->mensajes;
-                    $this->view->show('Inicio', $parametros);
+                    $this->view->show('Index', $parametros);
                 } else {
                     // foreach ($errores as $e) {
                     //     $this->mensajes[] = [

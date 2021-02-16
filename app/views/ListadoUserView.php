@@ -1,8 +1,7 @@
-<html>
-  <head>
+
     <?php require_once 'includes/head.php'; ?>
-  </head>
-  <body class="cuerpo">
+ 
+
     <div class="container centrar">
       <a href="?controller=home&accion=index">Inicio</a>
       <div class="container cuerpo text-center centrar">	
@@ -10,7 +9,7 @@
       </div>
       <!--Mostramos los mensajes que se hayan generado al realizar el listado-->
       <?php foreach ($mensajes as $mensaje) : ?> 
-        <div class="alert alert-<?= $mensaje["tipo"] ?>"><?= $mensaje["mensaje"] ?></div>
+        <div class="alert alert-<?= $mensaje['tipo']; ?>"><?= $mensaje['mensaje']; ?></div>
       <?php endforeach; ?>
       <!--Creamos la tabla que utilizaremos para el listado:-->  
       <table class="table table-striped">
@@ -26,16 +25,16 @@
         <?php foreach ($datos as $d) : ?>
           <!--Mostramos cada registro en una fila de la tabla-->
           <tr>  
-            <td><?= $d["nombre"] ?></td>
-            <!--<td><?= $d["password"] ?></td>-->
-            <td><?= $d["email"] ?></td>
-            <?php if ($d["imagen"] !== NULL) : ?>
-              <td><img src="fotos/<?= $d['imagen'] ?>" width="40" /></td>
+            <td><?= $d['nombre']; ?></td>
+            <!--<td><?= $d['password']; ?></td>-->
+            <td><?= $d['email']; ?></td>
+            <?php if ($d['imagen'] !== null) : ?>
+              <td><img src="fotos/<?= $d['imagen']; ?>" width="40" /></td>
             <?php else : ?>
               <td>----</td>
             <?php endif; ?>
             <!-- Enviamos a actuser.php, mediante GET, el id del registro que deseamos editar o eliminar: -->
-            <td><a href="?controller=user&accion=actuser&id=<?= $d['id'] ?>">Editar </a><a href="?controller=user&accion=deluser&id=<?= $d['id'] ?>">Eliminar</a></td>
+            <td><a href="?controller=user&accion=actuser&id=<?= $d['id']; ?>">Editar </a><a href="?controller=user&accion=deluser&id=<?= $d['id']; ?>">Eliminar</a></td>
           </tr>
         <?php endforeach; ?>
       </table>

@@ -52,7 +52,7 @@ class UserModel extends BaseModel
 
     public function setPassword($password)
     {
-        $this->password = $this->getHashedPassword($password);
+        $this->password = ($password);
     }
 
     public function setTelefono($telefono)
@@ -147,43 +147,43 @@ class UserModel extends BaseModel
      *
      * @return type
      *
-     * Obtiene una página de resgistros de actividades
+     * Obtiene una página de resgistros de users
      *
-     * @param int $pagina
      * @param int $regsxpag
      *
      * @return array con los datos a usar en la vista
      */
-    public function listado($pagina = 1, $regsxpag = 5)
+    public function listado($regsxpag, $offset)
     {
         $return = [
          'correcto' => false,
          'datos' => null,
          'error' => null,
         //  'datos' => $resultSet,
-         'numpaginas' => $numpaginas,
-         'regsxpag' => $regsxpag,
-         'totalregistros' => $totalregistros,
+        //  'numpaginas' => $numpaginas,
+        //  'regsxpag' => $regsxpag,
+        //  'totalregistros' => $totalregistros,
         //  'sql' => $sql,
       ];
 
-        $resultSet = null;
+        // $resultSet = null;
 
         //Definimos la variable $offset que indique la posición del registro desde el que se
         // mostrarán los registros de una página dentro de la paginación.
-        $offset = ($pagina > 1) ? (($pagina - 1) * $regsxpag) : 0;
+        // $offset = ($pagina > 1) ? (($pagina - 1) * $regsxpag) : 0;
 
-        //Calculamos el número de registros obtenidos
-        $totalregistros = $this->db->query('SELECT count(*) as total FROM usuarios');
-        $totalregistros = $totalregistros->fetch()['total'];
+        // //Calculamos el número de registros obtenidos
+        // $totalregistros = $this->db->query('SELECT count(*) as total FROM usuarios');
+        // $totalregistros = $totalregistros->fetch()['total'];
 
-        $numpaginas = ceil($totalregistros / $regsxpag);
+        // $numpaginas = ceil($totalregistros / $regsxpag);
 
         //Realizamos la consulta...
       try {  //Definimos la instrucción SQL
-         $sql = 'SELECT * FROM usuarios ORDER BY usuarios.nombre LIMIT $offset, $regsxpag';
+         $sql = 'SELECT * FROM usuarios ORDER BY usuarios.nombre LIMIT '.$offset.','.$regsxpag.'';
           // Hacemos directamente la consulta al no tener parámetros
           $resultsquery = $this->db->query($sql);
+          $resultsquery->execute();
           //Supervisamos si la inserción se realizó correctamente...
           if ($resultsquery) :
             $return['correcto'] = true;
@@ -483,5 +483,46 @@ class UserModel extends BaseModel
         }
 
         return $return;
+    }
+
+    public function actImg($datos)
+    {
+        $return = [
+         'correcto' => false,
+         'error' => null,
+      ];
+
+        try {
+            //Inicializamos la transacción
+            $this->db->beginTransaction();
+            //Definimos la instrucción SQL parametrizada
+            $sql = 'UPDATE usuarios SET imagen = :imagen WHERE id = :id';
+            $query = $this->db->prepare($sql);
+            $query->execute([
+                'imagen' => $datos['imagen'],
+         ]);
+            //Supervisamos si la inserción se realizó correctamente...
+            if ($query) {
+                $this->db->commit();  // commit() confirma los cambios realizados durante la transacción
+                $return['correcto'] = true;
+            } // o no :(
+        } catch (PDOException $ex) {
+            $this->db->rollback(); // rollback() se revierten los cambios realizados durante la transacción
+            $return['error'] = $ex->getMessage();
+            //die();
+        }
+
+        return $return;
+    }
+
+    public function cuentaUser()
+    {
+        $sql = 'SELECT count(*) as total FROM usuarios ';
+        $query = $this->db->prepare($sql);
+        $query->execute();
+        $query = $query->fetchAll(PDO::FETCH_ASSOC);
+        $total = $query[0]['total'];
+
+        return $total;
     }
 }

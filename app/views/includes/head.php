@@ -80,13 +80,13 @@ if (isset($_SESSION['email'])) {
                     <a class="nav-link" href="verano.html">Actividades</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="verano.html">Horarios</a>
+                    <a class="nav-link" href="?controller=activity&accion=horario">Horarios</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="verano.html">Datos Gimnasio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="verano.html">Usuarios</a>
+                    <a class="nav-link" href="?controller=user&accion=listado&pagina=1&regsxpag=5">Usuarios</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="?controller=index&accion=logout">Cerrar Sesion</a>
@@ -94,7 +94,7 @@ if (isset($_SESSION['email'])) {
                 <?php } ?>
                 <?php if ($rol_id == 1) { ?>
                 <li class="nav-item">
-                    <a class="nav-link" href="primavera.html">Horario</a>
+                    <a class="nav-link" href="?controller=activity&accion=horario">Horario</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="verano.html">Perfil</a>

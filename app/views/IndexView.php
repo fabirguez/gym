@@ -9,7 +9,6 @@
       <ul>
          <br/><br/>
          <h2>Bienvenido al portal del gimnasio Andalucía</h2>
-        <a href="?controller=home&accion=index">Login</a>
       </ul>
     </div>
     </div>
