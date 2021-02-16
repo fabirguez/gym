@@ -270,18 +270,20 @@ class UserController extends BaseController
         $valpassword2 = '';
         $valtelefono = '';
         $valdireccion = '';
+        $valrol_id = 3;
 
         // Si se ha pulsado el botón actualizar...
       if (isset($_POST['submit'])) { //Realizamos la actualización con los datos existentes en los campos
         $nuevonombre = filter_var($_POST['txtnombre'], FILTER_SANITIZE_STRING);
-          $nuevonif = filter_var($_POST[txtnif], FILTER_SANITIZE_STRING);
-          $nuevoapellidos = filter_var($_POST[txtapellidos], FILTER_SANITIZE_STRING);
-          $nuevoemail = filter_var($_POST[txtemail], FILTER_SANITIZE_STRING);
-          $nuevopassword = filter_var($_POST[txtpassword], FILTER_SANITIZE_STRING);
-          $nuevopassword2 = filter_var($_POST[txtpassword2], FILTER_SANITIZE_STRING);
-          $nuevotelefono = filter_var($_POST[txttelefono], FILTER_SANITIZE_STRING);
-          $nuevodireccion = filter_var($_POST[txtdireccion], FILTER_SANITIZE_STRING);
+          $nuevonif = filter_var($_POST['txtnif'], FILTER_SANITIZE_STRING);
+          $nuevoapellidos = filter_var($_POST['txtapellidos'], FILTER_SANITIZE_STRING);
+          $nuevoemail = filter_var($_POST['txtemail'], FILTER_SANITIZE_STRING);
+          $nuevopassword = filter_var($_POST['txtpassword'], FILTER_SANITIZE_STRING);
+          $nuevopassword2 = filter_var($_POST['txtpassword2'], FILTER_SANITIZE_STRING);
+          $nuevotelefono = filter_var($_POST['txttelefono'], FILTER_SANITIZE_STRING);
+          $nuevodireccion = filter_var($_POST['txtdireccion'], FILTER_SANITIZE_STRING);
           $nuevoimagen = '-';
+          $nuevorol_id = $_POST['txtrol_id'];
 
           $filtrardatos = [
           'nif' => $nuevonif,
@@ -290,7 +292,8 @@ class UserController extends BaseController
           'telefono' => $nuevotelefono,
       ];
 
-          $errores = $this->modelo->filtraDatos($filtra);
+          $errores = $this->modelo->filtraDatos($filtrardatos);
+          $errores += $this->modelo->existeEmail($nuevoemail);
           $errores += $this->modelo->comparaPassword($nuevopassword, $nuevopassword2);
 
           // Definimos la variable $imagen que almacenará el nombre de imagen
@@ -370,6 +373,7 @@ class UserController extends BaseController
           $valpassword = $nuevopassword;
           $valtelefono = $nuevotelefono;
           $valdireccion = $nuevodireccion;
+          $valrol_id = $nuevorol_id;
       } else { //Estamos rellenando los campos con los valores recibidos del listado
           if (isset($_GET['id']) && (is_numeric($_GET['id']))) {
               $id = $_GET['id'];
@@ -388,7 +392,8 @@ class UserController extends BaseController
               $valemail = $resultModelo['datos']['email'];
               $valpassword = $resultModelo['datos']['password'];
               $valtelefono = $resultModelo['datos']['telefono'];
-              $valdireccion = $resultModelo['datos']['direccion']; else :
+              $valdireccion = $resultModelo['datos']['direccion'];
+              $valrol_id = $resultModelo['datos']['rol_id']; else :
                $this->mensajes[] = [
                   'tipo' => 'danger',
                   'mensaje' => "No se pudieron obtener los datos de usuario!! :( <br/>({$resultModelo['error']})",
@@ -403,18 +408,17 @@ class UserController extends BaseController
          'datos' => [
             'txtnombre' => $valnombre,
             'txtnif' => $valnif,
-               'txtnombre' => $valapellidos,
-               'txtapellidos' => isset($apellidos) ? $apellidos : '',
+               'txtapellidos' => $valapellidos,
                 'txtemail' => $valemail,
                 'txtpassword' => $valpassword,
                 'txttelefono' => $valtelefono,
                 'txtdireccion' => $valdireccion,
                 // 'txtestado' => isset($estado) ? $estado : '',
                 // 'imagen' => isset($imagen) ? $imagen : '',
-                // 'rol_id' => isset($rol_id) ? $rol_id : 3,
+                 'txtrol_id' => $valrol_id,
          ],
          'mensajes' => $this->mensajes,
-         'id' => $id,
+        //  'id' => $id,
       ];
         //Mostramos la vista actuser
         $this->view->show('ActUser', $parametros);
