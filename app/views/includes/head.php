@@ -97,7 +97,7 @@ if (isset($_SESSION['email'])) {
                     <a class="nav-link" href="?controller=activity&accion=horario">Horario</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="verano.html">Perfil</a>
+                    <a class="nav-link" href="?controller=index&accion=perfil">Perfil</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="?controller=index&accion=logout">Cerrar Sesion</a>

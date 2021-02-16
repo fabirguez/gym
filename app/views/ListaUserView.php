@@ -48,7 +48,7 @@
                         <td>Estado</td>
                         <td>Imagen</td>
                         <td>Rol</td>
-                        <td>Borrar o editar </td>
+                        <td>Editar, borrar o gestionar </td>
                         
                      </tr>
                   </thead>
@@ -67,12 +67,20 @@
                               <td><?= $d['email']; ?></td>
                               <td><?= $d['telefono']; ?></td>
                               <td><?= $d['direccion']; ?></td>
-                              <td><?= $d['estado']; ?></td>
+                              <td><?php echo ($d['estado'] == 1) ? 'Activo' : 'Inactivo'; ?></td>
                               <td><img src='<?= $d['imagen']; ?>' style="width:7rem;"/></td>
-                              <td><?= $d['rol_id']; ?></td>
-                              <td>
-                                 <a href="?controller=user&accion=actuser&id=<?= $d['id']; ?>" data-toggle="tooltip" data-placement="left" title="Editar"><i class="fas fa-edit"></i></a>
-                                 <a class="confirmar" href="?controller=user&accion=deluser&id=<?= $d['id']; ?>" data-toggle="tooltip" data-placement="right" title="Borrar"><i class="fas fa-trash-alt"></i></a>
+                              <td><?php echo ($d['rol_id'] == 0) ? 'Administrador' : 'Usuario'; ?></td>
+                              <td><a href="?controller=user&accion=actuser&id=<?= $d['id']; ?>">Editar </a><a href="?controller=user&accion=deluser&id=<?= $d['id']; ?>">Eliminar</a>
+                              
+                              <?php if ($d['estado'] == 0) {?>
+                                <a href="?controller=user&accion=activarus&id=<?= $d['id']; ?>">Activar </a>
+
+                              <?php } else {?>
+                                <a href="?controller=user&accion=desactivarus&id=<?= $d['id']; ?>">Desctivar </a>
+
+                              <?php } ?>
+                              
+                              
                               </td>
                            </tr>
 

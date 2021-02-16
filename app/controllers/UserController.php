@@ -102,11 +102,17 @@ class UserController extends BaseController
         // verificamos que hemos recibido los parámetros desde la vista de listado
         if (isset($_GET['id']) && (is_numeric($_GET['id']))) {
             $id = $_GET['id'];
-            //Realizamos la operación de suprimir el usuario con el id=$id
-            $resultModelo = $this->modelo->deluser($id);
-            //Analizamos el valor devuelto por el modelo para definir el mensaje a
-            //mostrar en la vista listado
-            if ($resultModelo['correcto']) :
+            if ($_SESSION['id'] == $id) {
+                $this->mensajes[] = [
+                    'tipo' => 'danger',
+                    'mensaje' => 'No se ha podido eliminar.',
+                ];
+            } else {
+                //Realizamos la operación de suprimir el usuario con el id=$id
+                $resultModelo = $this->modelo->deluser($id);
+                //Analizamos el valor devuelto por el modelo para definir el mensaje a
+                //mostrar en la vista listado
+                if ($resultModelo['correcto']) :
             $this->mensajes[] = [
                'tipo' => 'success',
                'mensaje' => "Se eliminó correctamente el usuario $id",
@@ -115,7 +121,8 @@ class UserController extends BaseController
                'tipo' => 'danger',
                'mensaje' => "La eliminación del usuario no se realizó correctamente!! :( <br/>({$resultModelo['error']})",
             ];
-            endif;
+                endif;
+            }
         } else { //Si no recibimos el valor del parámetro $id generamos el mensaje indicativo:
             $this->mensajes[] = [
             'tipo' => 'danger',
@@ -474,5 +481,71 @@ class UserController extends BaseController
      ];
         //Mostramos la vista actuser
         $this->view->show('ActImg', $parametros);
+    }
+
+    public function activarus()
+    {
+        if (isset($_GET['id'])) {
+            $id = $_GET['id'];
+
+            $resultModelo = $this->modelo->activarus($id);
+            //Analizamos el valor devuelto por el modelo para definir el mensaje a
+            //mostrar en la vista listado
+            if ($resultModelo['correcto']) :
+            $this->mensajes[] = [
+               'tipo' => 'success',
+               'mensaje' => "Se activó correctamente el usuario $id",
+            ]; else :
+            $this->mensajes[] = [
+               'tipo' => 'danger',
+               'mensaje' => "La activacion del usuario no se realizó correctamente!! :( <br/>({$resultModelo['error']})",
+            ];
+            endif;
+        } else { //Si no recibimos el valor del parámetro $id generamos el mensaje indicativo:
+            $this->mensajes[] = [
+            'tipo' => 'danger',
+            'mensaje' => 'No se pudo acceder al id del usuario a activar!! :(',
+         ];
+        }
+
+        $parametros = [
+            'tituloventana' => 'Listado usuarios',
+            'datos' => [],
+            'mensajes' => $this->mensajes,
+         ];
+        $this->listado();
+    }
+
+    public function desactivarus()
+    {
+        if (isset($_GET['id'])) {
+            $id = $_GET['id'];
+
+            $resultModelo = $this->modelo->desactivarus($id);
+            //Analizamos el valor devuelto por el modelo para definir el mensaje a
+            //mostrar en la vista listado
+            if ($resultModelo['correcto']) :
+            $this->mensajes[] = [
+               'tipo' => 'success',
+               'mensaje' => "Se desactivó correctamente el usuario $id",
+            ]; else :
+            $this->mensajes[] = [
+               'tipo' => 'danger',
+               'mensaje' => "La desactivacion del usuario no se realizó correctamente!! :( <br/>({$resultModelo['error']})",
+            ];
+            endif;
+        } else { //Si no recibimos el valor del parámetro $id generamos el mensaje indicativo:
+            $this->mensajes[] = [
+            'tipo' => 'danger',
+            'mensaje' => 'No se pudo acceder al id del usuario a desactivar!! :(',
+         ];
+        }
+
+        $parametros = [
+            'tituloventana' => 'Listado usuarios',
+            'datos' => [],
+            'mensajes' => $this->mensajes,
+         ];
+        $this->listado();
     }
 }

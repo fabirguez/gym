@@ -180,7 +180,7 @@ class UserModel extends BaseModel
 
         //Realizamos la consulta...
       try {  //Definimos la instrucción SQL
-         $sql = 'SELECT * FROM usuarios ORDER BY usuarios.nombre LIMIT '.$offset.','.$regsxpag.'';
+         $sql = 'SELECT * FROM usuarios ORDER BY usuarios.estado LIMIT '.$offset.','.$regsxpag.'';
           // Hacemos directamente la consulta al no tener parámetros
           $resultsquery = $this->db->query($sql);
           $resultsquery->execute();
@@ -524,5 +524,67 @@ class UserModel extends BaseModel
         $total = $query[0]['total'];
 
         return $total;
+    }
+
+    public function activarus($id)
+    {
+        $return = [
+            'correcto' => false,
+            'error' => null,
+         ];
+
+        try {
+            //Inicializamos la transacción
+            $this->db->beginTransaction();
+            //Definimos la instrucción SQL parametrizada
+            $sql = 'UPDATE usuarios SET usuarios.estado = :estado WHERE usuarios.id = :id';
+            $query = $this->db->prepare($sql);
+            $query->execute([
+                   'id' => $id,
+                   'estado' => '1',
+            ]);
+            //Supervisamos si la inserción se realizó correctamente...
+            if ($query) {
+                $this->db->commit();  // commit() confirma los cambios realizados durante la transacción
+                $return['correcto'] = true;
+            } // o no :(
+        } catch (PDOException $ex) {
+            $this->db->rollback(); // rollback() se revierten los cambios realizados durante la transacción
+            $return['error'] = $ex->getMessage();
+            //die();
+        }
+
+        return $return;
+    }
+
+    public function desactivarus($id)
+    {
+        $return = [
+            'correcto' => false,
+            'error' => null,
+         ];
+
+        try {
+            //Inicializamos la transacción
+            $this->db->beginTransaction();
+            //Definimos la instrucción SQL parametrizada
+            $sql = 'UPDATE usuarios SET usuarios.estado = :estado WHERE usuarios.id = :id';
+            $query = $this->db->prepare($sql);
+            $query->execute([
+                   'id' => $id,
+                   'estado' => '0',
+            ]);
+            //Supervisamos si la inserción se realizó correctamente...
+            if ($query) {
+                $this->db->commit();  // commit() confirma los cambios realizados durante la transacción
+                $return['correcto'] = true;
+            } // o no :(
+        } catch (PDOException $ex) {
+            $this->db->rollback(); // rollback() se revierten los cambios realizados durante la transacción
+            $return['error'] = $ex->getMessage();
+            //die();
+        }
+
+        return $return;
     }
 }
