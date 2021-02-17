@@ -11,6 +11,15 @@
          <div class="container cuerpo text-center">	
       
          <h2>Bienvenido al portal del gimnasio Andalucía</h2>
+</br></br></br>
+         
+<?php
+          if ($_SESSION['rol_id' == 0]) {
+              echo '<h2> ADMINISTRADOR </h2>';
+          } elseif ($_SESSION['rol_id' == 1]) {
+              echo '<h2> USUARIO </h2>';
+          }
+         ?>
         
         </div>
       </ul>

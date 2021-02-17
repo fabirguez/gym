@@ -1,4 +1,5 @@
 <?php
+//SIN TERMINAR
      require_once 'includes/head.php';
     ?>
 
