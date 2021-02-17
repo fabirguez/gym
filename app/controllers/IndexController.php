@@ -1,6 +1,6 @@
 <?php
 /**
- * Controlador de la página index desde la que se puede hacer el login y el registro.
+ * Controlador de la página index desde la que se puede hacer el login, el registro, cerrar sesión, instalar bbdd y recordar contraseña.
  */
 
 /**
@@ -8,8 +8,17 @@
  */
 require_once MODELS_FOLDER.'UserModel.php';
 
+/**
+ * Clase controlador que será la encargada de obtener, para cada tarea, los datos
+ * necesarios de la base de datos, y posteriormente, tras su proceso de elaboración,
+ * enviarlos a la vista para su visualización.
+ */
 class IndexController extends BaseController
 {
+    /**
+     * Constructor que crea automáticamente un objeto modelo en el controlador e
+     * inicializa los mensajes a vacío.
+     */
     public function __construct()
     {
         parent::__construct();
@@ -17,6 +26,9 @@ class IndexController extends BaseController
         $this->mensajes = [];
     }
 
+    /**
+     * Método llama a la vista de la página de inicio.
+     */
     public function index()
     {
         $parametros = [
@@ -27,7 +39,7 @@ class IndexController extends BaseController
     }
 
     /**
-     * Podemos implementar la acción login.
+     * Funcion login.
      *
      * @return void
      */
@@ -51,7 +63,6 @@ class IndexController extends BaseController
                 'mensaje' => 'Login correcto',
              ];
                 $esActivo = $this->modelo->esActivo($_POST['txtemail']);
-                // if ($esActivo['correcto']) {
                 if ($tryLogin['datos']['estado'] == 1) {
                     $_SESSION['email'] = $_POST['txtemail'];
                     $parametros['email'] = $_POST['txtemail'];
@@ -121,7 +132,8 @@ class IndexController extends BaseController
     }
 
     /**
-     * Podemos implementar la acción registro de usuarios.
+     * Acción de registrar usuarios, el usuario añade sus datos y luego el administrador
+     * tiene que activarlo.
      *
      * @return void
      */
@@ -146,8 +158,11 @@ class IndexController extends BaseController
             $password2 = filter_var($_POST['txtpassword2'], FILTER_SANITIZE_STRING);
             $telefono = filter_var($_POST['txttelefono'], FILTER_SANITIZE_STRING);
             $direccion = filter_var($_POST['txtdireccion'], FILTER_SANITIZE_STRING);
+            //opcion de imagen no añadida, añadir mas adelante
             $imagen = '-';
+            //el estado está desactivado
             $estado = 0;
+            //y el rol sería de usuario por defecto
             $rol_id = 1;
             $filtrardatos = [
             'nif' => $nif,
@@ -156,8 +171,9 @@ class IndexController extends BaseController
             'telefono' => $telefono,
         ];
 
+            //Llama a la funcion para que filtre los datos pasandole los datos a filtrar
             $errores = $this->modelo->filtraDatos($filtrardatos);
-
+            //Se añaden mas errores, con += ha sido la forma con la que lo he conseguido
             $errores += $this->modelo->existeEmail($_POST['txtemail']);
             $errores += $this->modelo->comparaPassword($password, $password2);
 
@@ -188,6 +204,7 @@ class IndexController extends BaseController
              ];
                 endif;
             } else {
+                //recorre el array errores para mostrar los mensajes
                 foreach ($errores as $e) {
                     $this->mensajes[] = [
                         'tipo' => 'danger',
@@ -210,7 +227,7 @@ class IndexController extends BaseController
               'txtdireccion' => isset($direccion) ? $direccion : '',
               'txtestado' => isset($estado) ? $estado : 3,
               'imagen' => isset($imagen) ? $imagen : '',
-              'rol_id' => isset($rol_id) ? $rol_id : 0,
+              'rol_id' => isset($rol_id) ? $rol_id : 1,
        ],
        'mensajes' => $this->mensajes,
     ];
@@ -218,10 +235,11 @@ class IndexController extends BaseController
         $this->view->show('Register', $parametros);
     }
 
-    /*
-     * Otras acciones que puedan ser necesarias
+    /**
+     * Acción de cerrar sesion, borrando las variables de sesion.
+     *
+     * @return void
      */
-
     public function logout()
     {
         $parametros = [
@@ -230,11 +248,18 @@ class IndexController extends BaseController
             'mensajes' => [],
          ];
 
+        //Vacía las variables de sesión para que los usuarios no puedan hacer nada
         $_SESSION['email'] = '';
         $_SESSION['rol_id'] = '4';
         $this->view->show('Index', $parametros);
     }
 
+    /**
+     * Acción de recordar contraseña, guardando una nueva y desactivando la cuenta, para
+     * que el administrador vuelva a activarla. No funciona.
+     *
+     * @return void
+     */
     public function recordarPassword()
     {
         $parametros = [
@@ -251,15 +276,20 @@ class IndexController extends BaseController
                 'password' => $_POST['txtpassword'],
             ];
 
+            $nuevopassword = $_POST['txtpassword'];
+            $nuevopassword2 = $_POST['txtpassword2'];
+
             $errores = $this->modelo->filtraDatos($filtrardatos);
 
-            if (array_key_exists('email', $this->modelo->existeEmail($nuevoemail))) {
-                $errores += $this->modelo->existeEmail($nuevoemail);
+            //Busca si existe en los errores la clave email, porque significará
+            //que existe el mail, y si es así, añade un error
+            if (!array_key_exists('email', $this->modelo->existeEmail($nuevoemail))) {
+                $errores += ['mail' => 'No existe la cuenta escrita'];
             }
 
             $errores += $this->modelo->comparaPassword($nuevopassword, $nuevopassword2);
 
-            $recordarPass = $this->modelo->recordarPass($_POST['txtemail'], sha1($_POST['txtpassword']));
+            $recordarPass = $this->modelo->recordarPass($_POST['txtemail'], sha1($nuevopassword));
 
             if ($recordarPass['correcto'] == true) {
                 $this->mensajes[] = [
@@ -293,6 +323,11 @@ class IndexController extends BaseController
         $this->view->show('RecordarPass', $parametros);
     }
 
+    /**
+     * Acción de instalar la base de datos, pidiendo los datos como el servidor y el nombre de usuario.
+     *
+     * @return void
+     */
     public function instalar()
     {
         $this->view->show('Instalar');

@@ -36,6 +36,7 @@ class UserController extends BaseController
      */
     public function listado()
     {
+        //Si no estas logueado como admin no puedes acceder
         if ($_SESSION['rol_id'] == 0) {
             // Almacenamos en el array 'parametros[]'los valores que vamos a mostrar en la vista
             $parametros = [
@@ -60,8 +61,6 @@ class UserController extends BaseController
             // Realizamos la consulta y almacenamos los resultados en la variable $resultModelo
             $resultModelo = $this->modelo->listado($regsxpag, $offset);
 
-            // Realizamos la consulta y almacenamos los resultados en la variable $resultModelo
-            // $resultModelo = $this->modelo->listado();
             // Si la consulta se realizó correctamente transferimos los datos obtenidos
             // de la consulta del modelo ($resultModelo["datos"]) a nuestro array parámetros
             // ($parametros["datos"]), que será el que le pasaremos a la vista para visualizarlos
@@ -78,8 +77,6 @@ class UserController extends BaseController
             'mensaje' => "El listado no pudo realizarse correctamente!! :( <br/>({$resultModelo['error']})",
          ];
             endif;
-            //Asignamos al campo 'mensajes' del array de parámetros el valor del atributo
-            //'mensaje', que recoge cómo finalizó la operación:
 
             $parametros = [
             'tituloventana' => 'Listado de usuarios',
@@ -108,6 +105,7 @@ class UserController extends BaseController
      */
     public function deluser()
     {
+        //Si no estas logueado como administrador no puedes hacerlo
         if ($_SESSION['rol_id'] == 0) {
             // verificamos que hemos recibido los parámetros desde la vista de listado
             if (isset($_GET['id']) && (is_numeric($_GET['id']))) {
@@ -145,8 +143,13 @@ class UserController extends BaseController
         }
     }
 
+    /**
+     * Método de la clase controlador que realiza el añadido de un usuario,
+     * lo hace un administrador.
+     */
     public function adduser()
     {
+        //Si el rol del usuario logueado no es admin no puedee hacerlo
         if ($_SESSION['rol_id'] == 0) {
             $parametros = [
                 'tituloventana' => 'Registro de usuario by admin',
@@ -175,47 +178,13 @@ class UserController extends BaseController
             'telefono' => $telefono,
         ];
 
+          //Filta los datos y comprueba el email y las contraseñas
+
           $errores = $this->modelo->filtraDatos($filtrardatos);
 
           $errores += $this->modelo->existeEmail($email);
           $errores += $this->modelo->comparaPassword($password, $password2);
 
-          /* Realizamos la carga de la imagen en el servidor */
-          //LA IMAGEN SE AÑADE DESPUES
-          //       Comprobamos que el campo tmp_name tiene un valor asignado para asegurar que hemos
-          //       recibido la imagen correctamente
-          //       Definimos la variable $imagen que almacenará el nombre de imagen
-          //       que almacenará la Base de Datos inicializada a NULL
-          /*           $imagen = null;
-
-                    if (isset($_FILES['imagen']) && (!empty($_FILES['imagen']['tmp_name']))) {
-                        // Verificamos la carga de la imagen
-                        // Comprobamos si existe el directorio fotos, y si no, lo creamos
-                        if (!is_dir('assets/img/perfil')) {
-                            $dir = mkdir('assets/img/perfil', 0777, true);
-                        } else {
-                            $dir = true;
-                        }
-                        // Ya verificado que la carpeta uploads existe movemos el fichero seleccionado a dicha carpeta
-                        if ($dir) {
-                            //Para asegurarnos que el nombre va a ser único...
-                            $nombrefichimg = time().'-'.$_FILES['imagen']['name'];
-                            // Movemos el fichero de la carpeta temportal a la nuestra
-                            $movfichimg = move_uploaded_file($_FILES["imagen"]["tmp_name"], "assets/img/perfil/" . $nombrefichimg);
-                            $imagen = $nombrefichimg;
-                            // Verficamos que la carga se ha realizado correctamente
-                            if ($movfichimg) {
-                                $imagencargada = true;
-                            } else {
-                                $imagencargada = false;
-                                $this->mensajes[] = [
-                               'tipo' => 'danger',
-                               'mensaje' => 'Error: La imagen no se cargó correctamente! :(',
-                            ];
-                                $errores['imagen'] = 'Error: La imagen no se cargó correctamente! :(';
-                            }
-                        }
-                    } */
           // Si no se han producido errores realizamos el registro del usuario
 
           if (count($errores) == 0) {
@@ -242,6 +211,7 @@ class UserController extends BaseController
                ];
               endif;
           } else {
+              //Recorre los errores y los muestra si existen
               foreach ($errores as $e) {
                   $this->mensajes[] = [
                     'tipo' => 'danger',
@@ -267,7 +237,7 @@ class UserController extends BaseController
          ],
          'mensajes' => $this->mensajes,
       ];
-            //Visualizamos la vista asociada al registro de usuarios
+            //Visualizamos la vista asociada al registro del usuario
             $this->view->show('AddUser', $parametros);
         } else {
             $parametros = [
@@ -281,14 +251,14 @@ class UserController extends BaseController
 
     /**
      * Método de la clase controlador que permite actualizar los datos del usuario
-     * cuyo id coincide con el que se pasa como parámetro desde la vista de listado
-     * a través de GET.
+     * cuyo id coincide con el que se pasa como parámetro desde la vista de listado.
      */
     public function actuser()
     {
         // Array asociativo que almacenará los mensajes de error que se generen por cada campo
         $errores = [];
 
+        //Si no estas logueado como admin no entras
         if ($_SESSION['rol_id'] == 0) {
             // Inicializamos valores de los campos de texto
 
@@ -301,8 +271,6 @@ class UserController extends BaseController
             $valtelefono = '';
             $valdireccion = '';
             $valrol_id = 3;
-
-            //dnd guardo el id!!!
 
             // Si se ha pulsado el botón actualizar...
       if (isset($_POST['submit'])) { //Realizamos la actualización con los datos existentes en los campos
@@ -320,6 +288,8 @@ class UserController extends BaseController
           $nuevoimagen = '-';
           $nuevorol_id = $_POST['txtrol_id'];
 
+          //Se hace esto porque si no se quiere cambiar la contraseña no hace las comprobaciones
+          //pq daria error
           if ($_POST['txtpassword'] == '' && $_POST['txtpassword2'] == '') {
               $filtrardatos = [
                 'nif' => $nuevonif,
@@ -336,52 +306,22 @@ class UserController extends BaseController
           }
 
           $errores = $this->modelo->filtraDatos($filtrardatos);
+
+          //si el mail no es igual al escrito, que será que no quiero actualozarlo,
+          //comprueba si existe ya
           if ($this->modelo->listausuario($id)['datos']['email'] != $nuevoemail) {
               $errores += $this->modelo->existeEmail($nuevoemail);
           }
+
+          //si se ha escrito una nueva password las compara y la guarda para actualizarla
           if ($_POST['txtpassword'] != '' && $_POST['txtpassword2'] != '') {
               $errores += $this->modelo->comparaPassword($nuevopassword, $nuevopassword2);
               $nuevopassword = sha1($nuevopassword);
           }
 
-          // Definimos la variable $imagen que almacenará el nombre de imagen
-          // que almacenará la Base de Datos inicializada a NULL
-          //   $imagen = null;
-
-          //   if (isset($_FILES['imagen']) && (!empty($_FILES['imagen']['tmp_name']))) {
-          //       // Verificamos la carga de la imagen
-          //       // Comprobamos si existe el directorio fotos, y si no, lo creamos
-          //       if (!is_dir('fotos')) {
-          //           $dir = mkdir('fotos', 0777, true);
-          //       } else {
-          //           $dir = true;
-          //       }
-          //       // Ya verificado que la carpeta fotos existe movemos el fichero seleccionado a dicha carpeta
-          //       if ($dir) {
-          //           //Para asegurarnos que el nombre va a ser único...
-          //           $nombrefichimg = time().'-'.$_FILES['imagen']['name'];
-          //           // Movemos el fichero de la carpeta temportal a la nuestra
-          //           $movfichimg = move_uploaded_file($_FILES['imagen']['tmp_name'], 'fotos/'.$nombrefichimg);
-          //           $imagen = $nombrefichimg;
-          //           // Verficamos que la carga se ha realizado correctamente
-          //           if ($movfichimg) {
-          //               $imagencargada = true;
-          //           } else {
-          //               //Si no pudo moverse a la carpeta destino generamos un mensaje que se le
-          //               //mostrará al usuario en la vista actuser
-          //               $imagencargada = false;
-          //               $errores['imagen'] = 'Error: La imagen no se cargó correctamente! :(';
-          //               $this->mensajes[] = [
-          //              'tipo' => 'danger',
-          //              'mensaje' => 'Error: La imagen no se cargó correctamente! :(',
-          //           ];
-          //           }
-          //       }
-          //   }
-          //   $nuevaimagen = $imagen;
-
           //Ejecutamos la instrucción de actualización a la que le pasamos los valores
           if (count($errores) == 0) {
+              //si nuevo password esta vacio guarda la contraseña que tenia ya antes
               if (empty($nuevopassword)) {
                   $nuevopassword = $this->modelo->listausuario($id)['datos']['password'];
               }
@@ -400,7 +340,6 @@ class UserController extends BaseController
               //Analizamos cómo finalizó la operación de registro y generamos un mensaje
               //indicativo del estado correspondiente
               if ($resultModelo['correcto']) :
-            //    $this->listado();
               $this->mensajes[] = [
                   'tipo' => 'success',
                   'mensaje' => 'El usuario se actualizó correctamente!! :)',
@@ -486,6 +425,10 @@ class UserController extends BaseController
         }
     }
 
+    /**
+     * Método de la clase controlador que permite actualizar la foto del usuario
+     * cuyo id coincide con el que se pasa como parámetro desde la vista.
+     */
     public function actFoto()
     {
         $imagen;
@@ -549,12 +492,18 @@ class UserController extends BaseController
         $this->view->show('ActImg', $parametros);
     }
 
+    /**
+     * Método de la clase controlador que permite activar el usuario
+     * cuyo id coincide con el que se pasa como parámetro desde la vista de listado.
+     */
     public function activarus()
     {
+        //Si el logueado no es admin no puede
         if ($_SESSION['rol_id'] == 0) {
             if (isset($_GET['id'])) {
                 $id = $_GET['id'];
 
+                //Llama al modelo y active el user
                 $resultModelo = $this->modelo->activarus($id);
                 //Analizamos el valor devuelto por el modelo para definir el mensaje a
                 //mostrar en la vista listado
@@ -591,6 +540,10 @@ class UserController extends BaseController
         }
     }
 
+    /**
+     * Método de la clase controlador que permite desactivar el usuario
+     * cuyo id coincide con el que se pasa como parámetro desde la vista de listado.
+     */
     public function desactivarus()
     {
         if ($_SESSION['rol_id'] == 0) {
@@ -633,6 +586,10 @@ class UserController extends BaseController
         }
     }
 
+    /**
+     * Método de la clase controlador que imprime el listado de usuarios
+     * con html2pdf aunque no funciona.
+     */
     public function imprimeListado()
     {
         require VENDOR_FOLDER.'autoload.php';
@@ -677,7 +634,11 @@ class UserController extends BaseController
         }
     }
 
-    public function perfil()               /////////////////////////////////////MIRAR BIEN REVISAR
+    /**
+     * Método de la clase controlador que muestra el perfil del usuario
+     * Sin terminar.
+     */
+    public function perfil()
     {
         // Array asociativo que almacenará los mensajes de error que se generen por cada campo
         $errores = [];
