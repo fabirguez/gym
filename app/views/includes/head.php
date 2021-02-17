@@ -77,7 +77,7 @@ if (isset($_SESSION['email'])) {
             <ul class="navbar-nav mr-auto">
             <?php if ($rol_id == 0) { ?>
                 <li class="nav-item">
-                    <a class="nav-link disabled" href="">Actividades</a>
+                    <a class="nav-link" href="?controller=activity&accion=listadoActividades&pagina=1&regsxpag=5">Actividades</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link disabled" href="">Horarios</a>
@@ -118,4 +118,5 @@ if (isset($_SESSION['email'])) {
             </ul>
 
         </div>
+
     </nav>

@@ -11,11 +11,11 @@
          <div class="container p-3 my-3 rounded shadow-sm">
             <div class="row">
                <div class="col-sm-5">
-                  <h4 class="text-primary">Listado de Usuarios</h4>
+                  <h4 class="text-primary">Listado de Actividades</h4>
                </div>
                <div class="col-sm-4">
-                  <a class="text-blue nounderline" href="?controller=user&accion=adduser"><i class="fas fa-plus-square"></i>Nuevo usuario</a>
-                  <a class="text-blue nounderline" href="?controller=user&accion=imprimeListado"><i class="fas fa-plus-square"></i>Descargar lista usuarios</a>
+                  <a class="text-blue nounderline" href="?controller=activity&accion=addActividad"><i class="fas fa-plus-square"></i>Nueva actividad</a>
+                  <!-- <a class="text-blue nounderline" href="?controller=user&accion=imprimeListado"><i class="fas fa-plus-square"></i>Descargar lista usuarios</a> -->
                </div>
                <div class="col-sm-3">
                   <div class="dropdown">
@@ -23,9 +23,9 @@
                         Registros por página
                      </button>
                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="?controller=user&accion=listado&pagina=1&regsxpag=5">5</a>
-                        <a class="dropdown-item" href="?controller=user&accion=listado&pagina=1&regsxpag=10">10</a>
-                        <a class="dropdown-item" href="?controller=user&accion=listado&pagina=1&regsxpag=15">15</a>
+                        <a class="dropdown-item" href="?controller=activity&accion=listadoActividades&pagina=1&regsxpag=5">5</a>
+                        <a class="dropdown-item" href="?controller=activity&accion=listadoActividades&pagina=1&regsxpag=10">10</a>
+                        <a class="dropdown-item" href="?controller=activity&accion=listadoActividades&pagina=1&regsxpag=15">15</a>
                      </div>
                   </div>
                </div>
@@ -40,15 +40,10 @@
                   <thead class="thead-dark">
                      <tr>
                         <!-- <td>ID</td> -->
-                        <td>NIF</td>
                         <td>Nombre</td>
-                        <td>Apellidos</td>
-                        <td>Email</td>
-                        <td>Telefono</td>
-                        <td>Direccion</td>
-                        <td>Estado</td>
-                        <td>Rol</td>
-                        <td>Editar, borrar o gestionar </td>
+                        <td>Descripcion</td>
+                        <td>Aforo</td>
+                        <td>Editar o borrar</td>
                         
                      </tr>
                   </thead>
@@ -61,24 +56,12 @@
                      
                            <tr>
                            
-                              <td><?= $d['nif']; ?></td>
                               <td><?= $d['nombre']; ?></td>
-                              <td><?= $d['apellidos']; ?></td>
-                              <td><?= $d['email']; ?></td>
-                              <td><?= $d['telefono']; ?></td>
-                              <td><?= $d['direccion']; ?></td>
-                              <td><?php echo ($d['estado'] == 1) ? 'Activo' : 'Inactivo'; ?></td>
+                              <td><?= $d['descripcion']; ?></td>
+                              <td><?= $d['aforo']; ?></td>
+                              <td><a href="?controller=index&accion=actActividad&id=<?= $d['id']; ?>">Editar </a><a href="?controller=activity&accion=delActividad&id=<?= $d['id']; ?>">Eliminar</a>
                               
-                              <td><?php echo ($d['rol_id'] == 0) ? 'Administrador' : 'Usuario'; ?></td>
-                              <td><a href="?controller=user&accion=actuser&id=<?= $d['id']; ?>">Editar </a><a href="?controller=user&accion=deluser&id=<?= $d['id']; ?>">Eliminar</a>
                               
-                              <?php if ($d['estado'] == 0) {?>
-                                <a href="?controller=user&accion=activarus&id=<?= $d['id']; ?>">Activar </a>
-
-                              <?php } else {?>
-                                <a href="?controller=user&accion=desactivarus&id=<?= $d['id']; ?>">Desctivar </a>
-
-                              <?php } ?>
                               
                               
                               </td>
@@ -95,7 +78,7 @@
          <div class="row text-center">
             <div class="col-md-6">
                <?php
-               $url = '?controller=user&accion=listado'; ?>
+               $url = '?controller=activity&accion=listadoActividades'; ?>
                <?php //Sólo mostramos los enlaces a páginas si existen registros a mostrar
     if ($totalregistros >= 1):
 ?>

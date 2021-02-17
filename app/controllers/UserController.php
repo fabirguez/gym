@@ -676,4 +676,170 @@ class UserController extends BaseController
             $this->view->show('Prohibido', $parametros);
         }
     }
+
+    public function perfil()               /////////////////////////////////////MIRAR BIEN REVISAR
+    {
+        // Array asociativo que almacenará los mensajes de error que se generen por cada campo
+        $errores = [];
+
+        if ($_SESSION['rol_id'] == 0) {
+            // Inicializamos valores de los campos de texto
+
+            $valnombre = '';
+            $valnif = '';
+            $valapellidos = '';
+            $valemail = '';
+            $valpassword = '';
+            $valpassword2 = '';
+            $valtelefono = '';
+            $valdireccion = '';
+            $valrol_id = 3;
+
+            //dnd guardo el id!!!
+
+            // Si se ha pulsado el botón actualizar...
+      if (isset($_POST['submit'])) { //Realizamos la actualización con los datos existentes en los campos
+          $id = $_POST['id'];
+          $nuevonombre = filter_var($_POST['txtnombre'], FILTER_SANITIZE_STRING);
+          $nuevonif = filter_var($_POST['txtnif'], FILTER_SANITIZE_STRING);
+          $nuevoapellidos = filter_var($_POST['txtapellidos'], FILTER_SANITIZE_STRING);
+          $nuevoemail = filter_var($_POST['txtemail'], FILTER_SANITIZE_STRING);
+
+          $nuevopassword = filter_var($_POST['txtpassword'], FILTER_SANITIZE_STRING);
+          $nuevopassword2 = filter_var($_POST['txtpassword2'], FILTER_SANITIZE_STRING);
+
+          $nuevotelefono = filter_var($_POST['txttelefono'], FILTER_SANITIZE_STRING);
+          $nuevodireccion = filter_var($_POST['txtdireccion'], FILTER_SANITIZE_STRING);
+          $nuevoimagen = '-';
+          $nuevorol_id = $_POST['txtrol_id'];
+
+          if ($_POST['txtpassword'] == '' && $_POST['txtpassword2'] == '') {
+              $filtrardatos = [
+                'nif' => $nuevonif,
+                'email' => $nuevoemail,
+                'telefono' => $nuevotelefono,
+            ];
+          } else {
+              $filtrardatos = [
+          'nif' => $nuevonif,
+          'email' => $nuevoemail,
+          'password' => $nuevopassword,
+          'telefono' => $nuevotelefono,
+      ];
+          }
+
+          $errores = $this->modelo->filtraDatos($filtrardatos);
+          if ($this->modelo->listausuario($id)['datos']['email'] != $nuevoemail) {
+              $errores += $this->modelo->existeEmail($nuevoemail);
+          }
+          if ($_POST['txtpassword'] != '' && $_POST['txtpassword2'] != '') {
+              $errores += $this->modelo->comparaPassword($nuevopassword, $nuevopassword2);
+              $nuevopassword = sha1($nuevopassword);
+          }
+
+          //Ejecutamos la instrucción de actualización a la que le pasamos los valores
+          if (count($errores) == 0) {
+              if (empty($nuevopassword)) {
+                  $nuevopassword = $this->modelo->listausuario($id)['datos']['password'];
+              }
+              $resultModelo = $this->modelo->actuser([
+                  'id' => $id,
+                 'nif' => $nuevonif,
+                 'nombre' => $nuevonombre,
+                 'apellidos' => $nuevoapellidos,
+                  'email' => $nuevoemail,
+                  'password' => $nuevopassword,
+                  'telefono' => $nuevotelefono,
+                  'direccion' => $nuevodireccion,
+                  'imagen' => $nuevoimagen,
+                  'rol_id' => $nuevorol_id,
+              ]);
+              //Analizamos cómo finalizó la operación de registro y generamos un mensaje
+              //indicativo del estado correspondiente
+              if ($resultModelo['correcto']) :
+            //    $this->listado();
+              $this->mensajes[] = [
+                  'tipo' => 'success',
+                  'mensaje' => 'El usuario se actualizó correctamente!! :)',
+               ]; else :
+               $this->mensajes[] = [
+                  'tipo' => 'danger',
+                  'mensaje' => "El usuario no pudo actualizarse!! :( <br/>({$resultModelo['error']})",
+               ];
+              endif;
+          } else {
+              foreach ($errores as $e) {
+                  $this->mensajes[] = [
+                        'tipo' => 'danger',
+                        'mensaje' => $e,
+                     ];
+              }
+          }
+
+          //   // Obtenemos los valores para mostrarlos en los campos del formulario
+          $valnombre = $nuevonombre;
+          $valnif = $nuevonif;
+          $valapellidos = $nuevoapellidos;
+          $valemail = $nuevoemail;
+          $valpassword = $nuevopassword;
+          $valtelefono = $nuevotelefono;
+          $valdireccion = $nuevodireccion;
+          $valrol_id = $nuevorol_id;
+      } else { //Estamos rellenando los campos con los valores recibidos del listado
+          if (isset($_GET['id']) && (is_numeric($_GET['id']))) {
+              $id = $_GET['id'];
+              //Ejecutamos la consulta para obtener los datos del usuario #id
+              $resultModelo = $this->modelo->listausuario($id);
+              //Analizamos si la consulta se realiz´correctamente o no y generamos un
+              //mensaje indicativo
+              if ($resultModelo['correcto']) :
+                 $this->mensajes[] = [
+                    'tipo' => 'success',
+                    'mensaje' => 'Los datos del usuario se obtuvieron correctamente!! :)',
+                 ];
+              $valnombre = $resultModelo['datos']['nombre'];
+              $valnif = $resultModelo['datos']['nif'];
+              $valapellidos = $resultModelo['datos']['apellidos'];
+              $valemail = $resultModelo['datos']['email'];
+              $valpassword = $resultModelo['datos']['password'];
+              $valtelefono = $resultModelo['datos']['telefono'];
+              $valdireccion = $resultModelo['datos']['direccion'];
+              $valrol_id = $resultModelo['datos']['rol_id']; else :
+                 $this->mensajes[] = [
+                    'tipo' => 'danger',
+                    'mensaje' => "No se pudieron obtener los datos de usuario!! :( <br/>({$resultModelo['error']})",
+                 ];
+              endif;
+          }
+      }
+            //Preparamos un array con todos los valores que tendremos que rellenar en
+            //la vista adduser: título de la página y campos del formulario
+            $parametros = [
+         'tituloventana' => 'Actualiza usuario',
+         'datos' => [
+            'txtnombre' => $valnombre,
+            'txtnif' => $valnif,
+               'txtapellidos' => $valapellidos,
+                'txtemail' => $valemail,
+                'txtpassword' => '',
+                'txttelefono' => $valtelefono,
+                'txtdireccion' => $valdireccion,
+                // 'txtestado' => isset($estado) ? $estado : '',
+                // 'imagen' => isset($imagen) ? $imagen : '',
+                 'txtrol_id' => $valrol_id,
+         ],
+         'mensajes' => $this->mensajes,
+          'id' => $id,
+      ];
+            //Mostramos la vista actuser
+            $this->view->show('ActUser', $parametros);
+        } else {
+            $parametros = [
+                'tituloventana' => 'Prohibido el paso',
+                'datos' => [],
+                'mensajes' => $this->mensajes,
+             ];
+            $this->view->show('Prohibido', $parametros);
+        }
+    }
 }
