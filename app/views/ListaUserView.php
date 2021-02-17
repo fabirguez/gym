@@ -15,6 +15,7 @@
                </div>
                <div class="col-sm-4">
                   <a class="text-blue nounderline" href="?controller=user&accion=adduser"><i class="fas fa-plus-square"></i>Nuevo usuario</a>
+                  <a class="text-blue nounderline" href="?controller=user&accion=imprimeListado"><i class="fas fa-plus-square"></i>Descargar lista usuarios</a>
                </div>
                <div class="col-sm-3">
                   <div class="dropdown">

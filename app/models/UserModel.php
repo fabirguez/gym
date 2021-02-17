@@ -622,4 +622,29 @@ class UserModel extends BaseModel
 
         return $return;
     }
+
+    public function listadoCompleto()
+    {
+        $return = [
+        'correcto' => false,
+        'datos' => null,
+        'error' => null,
+     ];
+        //Realizamos la consulta...
+     try {  //Definimos la instrucción SQL
+        $sql = 'SELECT * FROM usuarios ORDER BY usuarios.id';
+         // Hacemos directamente la consulta al no tener parámetros
+         $resultsquery = $this->db->query($sql);
+         $resultsquery->execute();
+         //Supervisamos si la inserción se realizó correctamente...
+         if ($resultsquery) :
+           $return['correcto'] = true;
+         $return['datos'] = $resultsquery->fetchAll(PDO::FETCH_ASSOC);
+         endif; // o no :(
+     } catch (PDOException $ex) {
+         $return['error'] = $ex->getMessage();
+     }
+
+        return $return;
+    }
 }

@@ -632,4 +632,47 @@ class UserController extends BaseController
             $this->view->show('Prohibido', $parametros);
         }
     }
+
+    public function imprimeListado()
+    {
+        require_once VENDOR_FOLDER.'autoload.php';
+        if ($_SESSION['rol_id'] == 0) {
+            $parametros = [
+            'tituloventana' => 'PDF Listado de usuarios',
+            'datos' => null,
+            'mensajes' => [],
+         ];
+
+            $resultado = $this->modelo->listadoCompleto();
+
+            if ($resultado['correcto']) {
+                ob_start();
+                $parametros = ['datos' => $resultado];
+                $this->view->show('ListaUserpdf', $parametros);
+
+                $html = ob_get_clean();
+
+                $html2pdf = new Html2Pdf('P', 'A4', 'es', 'true', 'UTF-8');
+                $html2pdf->writeHTML($html);
+                $html2pdf->output('listado_usuarios.pdf ');
+                ob_end_clean();
+            } else {
+                $parametros = [
+                    'tituloventana' => 'Error desconocido',
+                    'datos' => null,
+                    'mensajes' => [
+                        'tipo' => 'danger',
+               'mensaje' => "El listado no se hizo correctamente :( <br/>({$resultado['error']})",
+            ],
+                 ];
+            }
+        } else {
+            $parametros = [
+            'tituloventana' => 'Prohibido el paso',
+            'datos' => [],
+            'mensajes' => $this->mensajes,
+         ];
+            $this->view->show('Prohibido', $parametros);
+        }
+    }
 }
