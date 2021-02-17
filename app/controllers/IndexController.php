@@ -230,9 +230,8 @@ class IndexController extends BaseController
             'mensajes' => [],
          ];
 
-        session_unset();
-        session_destroy();
-        session_start();
+        $_SESSION['email'] = '';
+        $_SESSION['rol_id'] = '4';
         $this->view->show('Index', $parametros);
     }
 }

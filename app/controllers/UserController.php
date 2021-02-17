@@ -36,8 +36,9 @@ class UserController extends BaseController
      */
     public function listado()
     {
-        // Almacenamos en el array 'parametros[]'los valores que vamos a mostrar en la vista
-        $parametros = [
+        if ($_SESSION['rol_id'] == 0) {
+            // Almacenamos en el array 'parametros[]'los valores que vamos a mostrar en la vista
+            $parametros = [
          'tituloventana' => 'Listado de usuarios',
          'datos' => null,
          'mensajes' => [],
@@ -45,29 +46,29 @@ class UserController extends BaseController
          'regsxpag' => null,
          'totalregistros' => null,
       ];
-        $regsxpag = (isset($_GET['regsxpag'])) ? (int) $_GET['regsxpag'] : 5;
-        //Establecemos la página que vamos a mostrar, por página, por defecto la 1
-        $pagina = (isset($_GET['pagina'])) ? (int) $_GET['pagina'] : 1;
-        //Definimos la variable $offset que indique la posición del registro desde el que se
-        // mostrarán los registros de una página dentro de la paginación.
-        $offset = ($pagina > 1) ? (($pagina - 1) * $regsxpag) : 0;
+            $regsxpag = (isset($_GET['regsxpag'])) ? (int) $_GET['regsxpag'] : 5;
+            //Establecemos la página que vamos a mostrar, por página, por defecto la 1
+            $pagina = (isset($_GET['pagina'])) ? (int) $_GET['pagina'] : 1;
+            //Definimos la variable $offset que indique la posición del registro desde el que se
+            // mostrarán los registros de una página dentro de la paginación.
+            $offset = ($pagina > 1) ? (($pagina - 1) * $regsxpag) : 0;
 
-        $totalregistros = $this->modelo->cuentaUser();
+            $totalregistros = $this->modelo->cuentaUser();
 
-        //Determinamos el número de páginas de la que constará mi paginación
-        $numpaginas = ceil($totalregistros / $regsxpag);
-        // Realizamos la consulta y almacenamos los resultados en la variable $resultModelo
-        $resultModelo = $this->modelo->listado($regsxpag, $offset);
+            //Determinamos el número de páginas de la que constará mi paginación
+            $numpaginas = ceil($totalregistros / $regsxpag);
+            // Realizamos la consulta y almacenamos los resultados en la variable $resultModelo
+            $resultModelo = $this->modelo->listado($regsxpag, $offset);
 
-        // Realizamos la consulta y almacenamos los resultados en la variable $resultModelo
-        // $resultModelo = $this->modelo->listado();
-        // Si la consulta se realizó correctamente transferimos los datos obtenidos
-        // de la consulta del modelo ($resultModelo["datos"]) a nuestro array parámetros
-        // ($parametros["datos"]), que será el que le pasaremos a la vista para visualizarlos
-        if ($resultModelo['correcto']) :
+            // Realizamos la consulta y almacenamos los resultados en la variable $resultModelo
+            // $resultModelo = $this->modelo->listado();
+            // Si la consulta se realizó correctamente transferimos los datos obtenidos
+            // de la consulta del modelo ($resultModelo["datos"]) a nuestro array parámetros
+            // ($parametros["datos"]), que será el que le pasaremos a la vista para visualizarlos
+            if ($resultModelo['correcto']) :
          $parametros['datos'] = $resultModelo['datos'];
-        //Definimos el mensaje para el alert de la vista de que todo fue correctamente
-        $this->mensajes[] = [
+            //Definimos el mensaje para el alert de la vista de que todo fue correctamente
+            $this->mensajes[] = [
             'tipo' => 'success',
             'mensaje' => 'El listado se realizó correctamente',
          ]; else :
@@ -76,11 +77,11 @@ class UserController extends BaseController
             'tipo' => 'danger',
             'mensaje' => "El listado no pudo realizarse correctamente!! :( <br/>({$resultModelo['error']})",
          ];
-        endif;
-        //Asignamos al campo 'mensajes' del array de parámetros el valor del atributo
-        //'mensaje', que recoge cómo finalizó la operación:
+            endif;
+            //Asignamos al campo 'mensajes' del array de parámetros el valor del atributo
+            //'mensaje', que recoge cómo finalizó la operación:
 
-        $parametros = [
+            $parametros = [
             'tituloventana' => 'Listado de usuarios',
             'datos' => $resultModelo['datos'],
             'mensajes' => $this->mensajes,
@@ -89,8 +90,16 @@ class UserController extends BaseController
             'totalregistros' => $totalregistros,
             'pagina' => $pagina,
          ];
-        // Incluimos la vista en la que visualizaremos los datos o un mensaje de error
-        $this->view->show('ListaUser', $parametros);
+            // Incluimos la vista en la que visualizaremos los datos o un mensaje de error
+            $this->view->show('ListaUser', $parametros);
+        } else {
+            $parametros = [
+            'tituloventana' => 'Prohibido el paso',
+            'datos' => [],
+            'mensajes' => $this->mensajes,
+         ];
+            $this->view->show('Prohibido', $parametros);
+        }
     }
 
     /**
@@ -99,15 +108,16 @@ class UserController extends BaseController
      */
     public function deluser()
     {
-        // verificamos que hemos recibido los parámetros desde la vista de listado
-        if (isset($_GET['id']) && (is_numeric($_GET['id']))) {
-            $id = $_GET['id'];
+        if ($_SESSION['rol_id'] == 0) {
+            // verificamos que hemos recibido los parámetros desde la vista de listado
+            if (isset($_GET['id']) && (is_numeric($_GET['id']))) {
+                $id = $_GET['id'];
 
-            //Realizamos la operación de suprimir el usuario con el id=$id
-            $resultModelo = $this->modelo->deluser($id);
-            //Analizamos el valor devuelto por el modelo para definir el mensaje a
-            //mostrar en la vista listado
-            if ($resultModelo['correcto']) :
+                //Realizamos la operación de suprimir el usuario con el id=$id
+                $resultModelo = $this->modelo->deluser($id);
+                //Analizamos el valor devuelto por el modelo para definir el mensaje a
+                //mostrar en la vista listado
+                if ($resultModelo['correcto']) :
             $this->mensajes[] = [
                'tipo' => 'success',
                'mensaje' => "Se eliminó correctamente el usuario $id",
@@ -116,22 +126,31 @@ class UserController extends BaseController
                'tipo' => 'danger',
                'mensaje' => "La eliminación del usuario no se realizó correctamente!! :( <br/>({$resultModelo['error']})",
             ];
-            endif;
-        } else { //Si no recibimos el valor del parámetro $id generamos el mensaje indicativo:
-            $this->mensajes[] = [
+                endif;
+            } else { //Si no recibimos el valor del parámetro $id generamos el mensaje indicativo:
+                $this->mensajes[] = [
             'tipo' => 'danger',
             'mensaje' => 'No se pudo acceder al id del usuario a eliminar!! :(',
          ];
+            }
+            //Realizamos el listado de los usuarios
+            $this->listado();
+        } else {
+            $parametros = [
+            'tituloventana' => 'Prohibido el paso',
+            'datos' => [],
+            'mensajes' => $this->mensajes,
+         ];
+            $this->view->show('Prohibido', $parametros);
         }
-        //Realizamos el listado de los usuarios
-        $this->listado();
     }
 
     public function adduser()
     {
-        // Array asociativo que almacenará los mensajes de error que se generen por cada campo
-        $errores = [];
-        // Si se ha pulsado el botón guardar...
+        if ($_SESSION['rol_id'] == 0) {
+            // Array asociativo que almacenará los mensajes de error que se generen por cada campo
+            $errores = [];
+            // Si se ha pulsado el botón guardar...
       if (isset($_POST) && !empty($_POST) && isset($_POST['submit'])) { // y hemos recibido las variables del formulario y éstas no están vacías...
         $nombre = filter_var($_POST['txtnombre'], FILTER_SANITIZE_STRING);
           $nif = filter_var($_POST['txtnif'], FILTER_SANITIZE_STRING);
@@ -225,7 +244,7 @@ class UserController extends BaseController
           }
       }
 
-        $parametros = [
+            $parametros = [
          'tituloventana' => 'Registro de usuario',
          'datos' => [
             'txtnombre' => isset($nombre) ? $nombre : '',
@@ -242,8 +261,16 @@ class UserController extends BaseController
          ],
          'mensajes' => $this->mensajes,
       ];
-        //Visualizamos la vista asociada al registro de usuarios
-        $this->view->show('AddUser', $parametros);
+            //Visualizamos la vista asociada al registro de usuarios
+            $this->view->show('AddUser', $parametros);
+        } else {
+            $parametros = [
+            'tituloventana' => 'Prohibido el paso',
+            'datos' => [],
+            'mensajes' => $this->mensajes,
+         ];
+            $this->view->show('Prohibido', $parametros);
+        }
     }
 
     /**
@@ -255,21 +282,23 @@ class UserController extends BaseController
     {
         // Array asociativo que almacenará los mensajes de error que se generen por cada campo
         $errores = [];
-        // Inicializamos valores de los campos de texto
 
-        $valnombre = '';
-        $valnif = '';
-        $valapellidos = '';
-        $valemail = '';
-        $valpassword = '';
-        $valpassword2 = '';
-        $valtelefono = '';
-        $valdireccion = '';
-        $valrol_id = 3;
+        if ($_SESSION['rol_id'] == 0) {
+            // Inicializamos valores de los campos de texto
 
-        //dnd guardo el id!!!
+            $valnombre = '';
+            $valnif = '';
+            $valapellidos = '';
+            $valemail = '';
+            $valpassword = '';
+            $valpassword2 = '';
+            $valtelefono = '';
+            $valdireccion = '';
+            $valrol_id = 3;
 
-        // Si se ha pulsado el botón actualizar...
+            //dnd guardo el id!!!
+
+            // Si se ha pulsado el botón actualizar...
       if (isset($_POST['submit'])) { //Realizamos la actualización con los datos existentes en los campos
           $id = $_POST['id'];
           $nuevonombre = filter_var($_POST['txtnombre'], FILTER_SANITIZE_STRING);
@@ -420,9 +449,9 @@ class UserController extends BaseController
               endif;
           }
       }
-        //Preparamos un array con todos los valores que tendremos que rellenar en
-        //la vista adduser: título de la página y campos del formulario
-        $parametros = [
+            //Preparamos un array con todos los valores que tendremos que rellenar en
+            //la vista adduser: título de la página y campos del formulario
+            $parametros = [
          'tituloventana' => 'Actualiza usuario',
          'datos' => [
             'txtnombre' => $valnombre,
@@ -439,8 +468,16 @@ class UserController extends BaseController
          'mensajes' => $this->mensajes,
           'id' => $id,
       ];
-        //Mostramos la vista actuser
-        $this->view->show('ActUser', $parametros);
+            //Mostramos la vista actuser
+            $this->view->show('ActUser', $parametros);
+        } else {
+            $parametros = [
+                'tituloventana' => 'Prohibido el paso',
+                'datos' => [],
+                'mensajes' => $this->mensajes,
+             ];
+            $this->view->show('Prohibido', $parametros);
+        }
     }
 
     public function actFoto()
@@ -508,13 +545,14 @@ class UserController extends BaseController
 
     public function activarus()
     {
-        if (isset($_GET['id'])) {
-            $id = $_GET['id'];
+        if ($_SESSION['rol_id'] == 0) {
+            if (isset($_GET['id'])) {
+                $id = $_GET['id'];
 
-            $resultModelo = $this->modelo->activarus($id);
-            //Analizamos el valor devuelto por el modelo para definir el mensaje a
-            //mostrar en la vista listado
-            if ($resultModelo['correcto']) :
+                $resultModelo = $this->modelo->activarus($id);
+                //Analizamos el valor devuelto por el modelo para definir el mensaje a
+                //mostrar en la vista listado
+                if ($resultModelo['correcto']) :
             $this->mensajes[] = [
                'tipo' => 'success',
                'mensaje' => "Se activó correctamente el usuario $id",
@@ -523,31 +561,40 @@ class UserController extends BaseController
                'tipo' => 'danger',
                'mensaje' => "La activacion del usuario no se realizó correctamente!! :( <br/>({$resultModelo['error']})",
             ];
-            endif;
-        } else { //Si no recibimos el valor del parámetro $id generamos el mensaje indicativo:
-            $this->mensajes[] = [
+                endif;
+            } else { //Si no recibimos el valor del parámetro $id generamos el mensaje indicativo:
+                $this->mensajes[] = [
             'tipo' => 'danger',
             'mensaje' => 'No se pudo acceder al id del usuario a activar!! :(',
          ];
-        }
+            }
 
-        $parametros = [
+            $parametros = [
             'tituloventana' => 'Listado usuarios',
             'datos' => [],
             'mensajes' => $this->mensajes,
          ];
-        $this->listado();
+            $this->listado();
+        } else {
+            $parametros = [
+            'tituloventana' => 'Prohibido el paso',
+            'datos' => [],
+            'mensajes' => $this->mensajes,
+         ];
+            $this->view->show('Prohibido', $parametros);
+        }
     }
 
     public function desactivarus()
     {
-        if (isset($_GET['id'])) {
-            $id = $_GET['id'];
+        if ($_SESSION['rol_id'] == 0) {
+            if (isset($_GET['id'])) {
+                $id = $_GET['id'];
 
-            $resultModelo = $this->modelo->desactivarus($id);
-            //Analizamos el valor devuelto por el modelo para definir el mensaje a
-            //mostrar en la vista listado
-            if ($resultModelo['correcto']) :
+                $resultModelo = $this->modelo->desactivarus($id);
+                //Analizamos el valor devuelto por el modelo para definir el mensaje a
+                //mostrar en la vista listado
+                if ($resultModelo['correcto']) :
             $this->mensajes[] = [
                'tipo' => 'success',
                'mensaje' => "Se desactivó correctamente el usuario $id",
@@ -556,19 +603,27 @@ class UserController extends BaseController
                'tipo' => 'danger',
                'mensaje' => "La desactivacion del usuario no se realizó correctamente!! :( <br/>({$resultModelo['error']})",
             ];
-            endif;
-        } else { //Si no recibimos el valor del parámetro $id generamos el mensaje indicativo:
-            $this->mensajes[] = [
+                endif;
+            } else { //Si no recibimos el valor del parámetro $id generamos el mensaje indicativo:
+                $this->mensajes[] = [
             'tipo' => 'danger',
             'mensaje' => 'No se pudo acceder al id del usuario a desactivar!! :(',
          ];
-        }
+            }
 
-        $parametros = [
+            $parametros = [
             'tituloventana' => 'Listado usuarios',
             'datos' => [],
             'mensajes' => $this->mensajes,
          ];
-        $this->listado();
+            $this->listado();
+        } else {
+            $parametros = [
+            'tituloventana' => 'Prohibido el paso',
+            'datos' => [],
+            'mensajes' => $this->mensajes,
+         ];
+            $this->view->show('Prohibido', $parametros);
+        }
     }
 }
