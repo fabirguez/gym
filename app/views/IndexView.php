@@ -14,9 +14,9 @@
 </br></br></br>
          
 <?php
-          if ($_SESSION['rol_id' == 0]) {
+          if ($_SESSION['rol_id'] == 0) {
               echo '<h2> ADMINISTRADOR </h2>';
-          } elseif ($_SESSION['rol_id' == 1]) {
+          } elseif ($_SESSION['rol_id'] == 1) {
               echo '<h2> USUARIO </h2>';
           }
          ?>
