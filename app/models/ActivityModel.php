@@ -1,8 +1,8 @@
 <?php
 
 /**
- *   Clase 'ActivityModel' que implementa el modelo de usuarios de nuestra aplicación en una
- * arquitectura MVC. Se encarga de gestionar el acceso a la tabla usuarios.
+ *   Clase 'ActivityModel' que implementa el modelo de actividades de nuestra aplicación en una
+ * arquitectura MVC. Se encarga de gestionar el acceso a la tabla actividades.
  */
 class ActivityModel extends BaseModel
 {
@@ -58,30 +58,29 @@ class ActivityModel extends BaseModel
         return $this->aforo;
     }
 
+    /**
+     * Función que realiza el listado de todas las actividades registradas
+     * Devuelve un array asociativo con tres campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'datos': almacena todos los datos obtenidos de la consulta.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @return type
+     *
+     * Obtiene una página de resgistros de actividades
+     *
+     * @param int $regsxpag
+     * @param int $offset
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function listadoActividades($regsxpag, $offset)
     {
         $return = [
          'correcto' => false,
          'datos' => null,
          'error' => null,
-        //  'datos' => $resultSet,
-        //  'numpaginas' => $numpaginas,
-        //  'regsxpag' => $regsxpag,
-        //  'totalregistros' => $totalregistros,
-        //  'sql' => $sql,
       ];
-
-        // $resultSet = null;
-
-        //Definimos la variable $offset que indique la posición del registro desde el que se
-        // mostrarán los registros de una página dentro de la paginación.
-        // $offset = ($pagina > 1) ? (($pagina - 1) * $regsxpag) : 0;
-
-        // //Calculamos el número de registros obtenidos
-        // $totalregistros = $this->db->query('SELECT count(*) as total FROM usuarios');
-        // $totalregistros = $totalregistros->fetch()['total'];
-
-        // $numpaginas = ceil($totalregistros / $regsxpag);
 
         //Realizamos la consulta...
       try {  //Definimos la instrucción SQL
@@ -101,6 +100,21 @@ class ActivityModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Función que realiza el añadido de una actividad
+     * Devuelve un array asociativo con tres campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'datos': almacena todos los datos obtenidos de la consulta.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @return type
+     *
+     * Añade una actividad
+     *
+     * @param array $datos
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function addActividad($datos)
     {
         $return = [
@@ -135,6 +149,21 @@ class ActivityModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Función que realiza la actualizacion de una actividad
+     * Devuelve un array asociativo con tres campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'datos': almacena todos los datos obtenidos de la consulta.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @return type
+     *
+     * Actualiza una actividad
+     *
+     * @param array $datos
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function actActividad($datos)
     {
         $return = [
@@ -168,6 +197,20 @@ class ActivityModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Función que realiza el añadido de una actividad
+     * Devuelve un array asociativo con tres campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @return type
+     *
+     * Borra una actividad
+     *
+     * @param int $id
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function delActividad($id)
     {
         // La función devuelve un array con dos valores:'correcto', que indica si la
@@ -202,6 +245,18 @@ class ActivityModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Función que realiza el filtrado de datos
+     * Devuelve un array asociativo con los errores.
+     *
+     * @return type
+     *
+     * Filtra los datos pasados por parametro
+     *
+     * @param array $filtra
+     *
+     * @return array con los errores a usar en la vista
+     */
     public function filtraDatos($filtra)
     {
         $errores = [];
@@ -213,6 +268,18 @@ class ActivityModel extends BaseModel
         return $errores;
     }
 
+    /**
+     * Función que comprueba si existe una actividad
+     * Devuelve un array asociativo con los errores.
+     *
+     * @return type
+     *
+     * Comprueba si la actividad existe
+     *
+     * @param string $nombre
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function existeActividad($nombre)
     {
         $errores = [];
@@ -236,6 +303,21 @@ class ActivityModel extends BaseModel
         return $errores;
     }
 
+    /**
+     * Función que realiza el listado de una actividad
+     * Devuelve un array asociativo con tres campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'datos': almacena todos los datos obtenidos de la consulta.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @return type
+     *
+     * Lista la actividad
+     *
+     * @param int $id
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function listaActividad($id)
     {
         $return = [
@@ -263,6 +345,15 @@ class ActivityModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Función que cuenta las actividades que hay en total
+     * Devuelve un int con el total.
+     *
+     * @return type
+     *
+     * Obtiene el total de actividades
+     * @return int con los datos a usar en la vista
+     */
     public function cuentaActividad()
     {
         $sql = 'SELECT count(*) as total FROM actividades ';

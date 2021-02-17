@@ -39,6 +39,13 @@ abstract class BaseModel
         return $resultSet;
     }
 
+    /**
+     * Método genérico para obtener todos los registros de la tabla $table por el id que se le pasa.
+     *
+     * @param int $id
+     *
+     * @return void
+     */
     public function getById($id)
     {
         $resultSet = null;
@@ -52,6 +59,14 @@ abstract class BaseModel
         return $resultSet;
     }
 
+    /**
+     * Método genérico para obtener todos los registros de la tabla $table por la columna y el valor que se le pasa.
+     *
+     * @param int $column
+     * @param int $value
+     *
+     * @return void
+     */
     public function getBy($column, $value)
     {
         $resultSet = null;
@@ -65,6 +80,13 @@ abstract class BaseModel
         return $resultSet;
     }
 
+    /**
+     * Método genérico para borrar por el id pasado por parametro.
+     *
+     * @param int $id
+     *
+     * @return void
+     */
     public function deleteById($id)
     {
         $query = $this->db->query("DELETE FROM $this->table WHERE id = $id");
@@ -72,6 +94,14 @@ abstract class BaseModel
         return $query;
     }
 
+    /**
+     * Método genérico para borrar los registros de la tabla $table por la columna y el valor que se le pasa.
+     *
+     * @param int $column
+     * @param int $value
+     *
+     * @return void
+     */
     public function deleteBy($column, $value)
     {
         $query = $this->db->query("DELETE FROM $this->table WHERE $column = '$value'");

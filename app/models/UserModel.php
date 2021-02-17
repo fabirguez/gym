@@ -159,24 +159,7 @@ class UserModel extends BaseModel
          'correcto' => false,
          'datos' => null,
          'error' => null,
-        //  'datos' => $resultSet,
-        //  'numpaginas' => $numpaginas,
-        //  'regsxpag' => $regsxpag,
-        //  'totalregistros' => $totalregistros,
-        //  'sql' => $sql,
       ];
-
-        // $resultSet = null;
-
-        //Definimos la variable $offset que indique la posición del registro desde el que se
-        // mostrarán los registros de una página dentro de la paginación.
-        // $offset = ($pagina > 1) ? (($pagina - 1) * $regsxpag) : 0;
-
-        // //Calculamos el número de registros obtenidos
-        // $totalregistros = $this->db->query('SELECT count(*) as total FROM usuarios');
-        // $totalregistros = $totalregistros->fetch()['total'];
-
-        // $numpaginas = ceil($totalregistros / $regsxpag);
 
         //Realizamos la consulta...
       try {  //Definimos la instrucción SQL
@@ -198,10 +181,13 @@ class UserModel extends BaseModel
 
     /**
      * Método que elimina el usuario cuyo id es el que se le pasa como parámetro.
+     * Devuelve un array asociativo con dos campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
      *
      * @param $id es un valor numérico. Es el campo clave de la tabla
      *
-     * @return bool
+     * @return array con los datos a usar en la vista
      */
     public function deluser($id)
     {
@@ -238,9 +224,14 @@ class UserModel extends BaseModel
     }
 
     /**
-     * @param type $datos
+     * Método que añade un usuario con los datos que se le pasa como parametro.
+     * Devuelve un array asociativo con dos campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
      *
-     * @return type
+     * @param array $datos
+     *
+     * @return array con los datos a usar en la vista
      */
     public function adduser($datos)
     {
@@ -283,6 +274,16 @@ class UserModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Método que actualiza un usuario con los datos que se le pasa como parametro.
+     * Devuelve un array asociativo con dos campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @param array $datos
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function actuser($datos)
     {
         $return = [
@@ -323,6 +324,17 @@ class UserModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Método que lista un usuario con el id que se le pasa como parametro.
+     * Devuelve un array asociativo con tres campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'datos': almacena todos los datos obtenidos de la consulta.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @param int $id
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function listausuario($id)
     {
         $return = [
@@ -350,6 +362,14 @@ class UserModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Método que comprueba si existe un email con el email que se le pasa como parametro.
+     * Devuelve un array asociativo con los errores.
+     *
+     * @param string $email
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function existeEmail($email)
     {
         $errores = [];
@@ -373,6 +393,14 @@ class UserModel extends BaseModel
         return $errores;
     }
 
+    /**
+     * Método que filtra los datos que se le pasa como parametro.
+     * Devuelve un array asociativo con los errores.
+     *
+     * @param array $filtra
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function filtraDatos($filtra)
     {
         $errores = [];
@@ -395,6 +423,15 @@ class UserModel extends BaseModel
         return $errores;
     }
 
+    /**
+     * Método que compara dos contraseñas.
+     * Devuelve un array asociativo con los errores.
+     *
+     * @param string $password
+     * @param string $password2
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function comparaPassword($password, $password2)
     {
         $errores = [];
@@ -411,6 +448,18 @@ class UserModel extends BaseModel
         return $errores;
     }
 
+    /**
+     * Método que compara un email con su contraseña en su tabla de la bbdd.
+     * Devuelve un array asociativo con tres campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'datos': almacena todos los datos obtenidos de la consulta.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @param string $email
+     * @param string $password
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function tryLogin($email, $password)
     {
         $return = [
@@ -437,6 +486,17 @@ class UserModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Método que busca el rol del email que se le pasa como parametro.
+     * Devuelve un array asociativo con tres campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'datos': almacena todos los datos obtenidos de la consulta.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @param string $email
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function rolEmail($email)
     {
         $return = [
@@ -463,6 +523,17 @@ class UserModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Método que comprueba que un email esté activo.
+     * Devuelve un array asociativo con tres campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'datos': almacena todos los datos obtenidos de la consulta.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @param string $email
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function esActivo($email)
     {
         $return = [
@@ -488,6 +559,17 @@ class UserModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Método que actualiza la imagen de una fila en la tabla usuarios con los datos
+     * que se le pasan como parametro.
+     * Devuelve un array asociativo con dos campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @param array $datos
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function actImg($datos)
     {
         $return = [
@@ -518,6 +600,11 @@ class UserModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Método que cuenta los usuarios que hay.
+     *
+     * @return int con el total
+     */
     public function cuentaUser()
     {
         $sql = 'SELECT count(*) as total FROM usuarios ';
@@ -529,6 +616,16 @@ class UserModel extends BaseModel
         return $total;
     }
 
+    /**
+     * Método que activa el usuario que se le pasa como parametro con el id.
+     * Devuelve un array asociativo con dos campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @param int $id
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function activarus($id)
     {
         $return = [
@@ -560,6 +657,16 @@ class UserModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Método que desactiva el usuario que se le pasa como parametro con el id.
+     * Devuelve un array asociativo con dos campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @param int $id
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function desactivarus($id)
     {
         $return = [
@@ -591,6 +698,18 @@ class UserModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Método que cambia la contraseña y el estado para que luego el administrador
+     * lo active.
+     * Devuelve un array asociativo con dos campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @param string $email
+     * @param string $password
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function recordarPass($email, $password)
     {
         $return = [
@@ -623,6 +742,15 @@ class UserModel extends BaseModel
         return $return;
     }
 
+    /**
+     * Método que lista todos los usuarios.
+     * Devuelve un array asociativo con tres campos:
+     * -'correcto': indica si el listado se realizó correctamente o no.
+     * -'datos': almacena todos los datos obtenidos de la consulta.
+     * -'error': almacena el mensaje asociado a una situación errónea (excepción).
+     *
+     * @return array con los datos a usar en la vista
+     */
     public function listadoCompleto()
     {
         $return = [
