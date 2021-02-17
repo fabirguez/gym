@@ -110,6 +110,10 @@ if (isset($_SESSION['email'])) {
                 <li class="nav-item">
                     <a class="nav-link" href="?controller=index&accion=register">Registrarse</a>
                 </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="?controller=index&accion=instalar">Instalar</a>
+                </li>
                 <?php } ?>
             </ul>
 

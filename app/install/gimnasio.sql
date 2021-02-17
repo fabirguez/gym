@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 13-02-2021 a las 21:27:13
+-- Tiempo de generación: 17-02-2021 a las 05:52:24
 -- Versión del servidor: 10.4.17-MariaDB
 -- Versión de PHP: 7.4.13
 
@@ -116,14 +116,6 @@ CREATE TABLE `tramo_usuario` (
   `fecha_reserva` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Volcado de datos para la tabla `tramo_usuario`
---
-
-INSERT INTO `tramo_usuario` (`id`, `tramo_id`, `usuario_id`, `fecha_actividad`, `fecha_reserva`) VALUES
-(1, 1, 1, '2021-02-14', '2021-02-09'),
-(2, 2, 1, '2021-02-15', '2021-02-09');
-
 -- --------------------------------------------------------
 
 --
@@ -149,8 +141,8 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `nif`, `nombre`, `apellidos`, `email`, `password`, `telefono`, `direccion`, `estado`, `imagen`, `rol_id`) VALUES
-(1, '12345678t', 'Fabian', 'Rodriguez', 'fabi@fabi.es', '1234', 123123123, 'Avenida Andalucia', 1, 'No img', 0),
-(2, '12121212e', 'Andrea', 'Rodriguez', 'andrea@gym.com', '1234', 123123321, 'Calle Gibraleon', 1, 'No', 1);
+(1, '32323232d', 'Admin', 'Admin', 'admin@admin.es', 'd033e22ae348aeb5660fc2140aec35850c4da997', 666666666, 'Admin', 1, '-', 0),
+(3, '22222222e', 'Andrea', 'Socia', 'socia@socia.es', 'cc9f816a42431cf852cdc7a3fad42a6f65ffce24', 676676687, 'aqui', 0, '-', 1);
 
 --
 -- Índices para tablas volcadas
@@ -229,7 +221,7 @@ ALTER TABLE `tramo_usuario`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Restricciones para tablas volcadas
@@ -239,20 +231,20 @@ ALTER TABLE `usuarios`
 -- Filtros para la tabla `tramos`
 --
 ALTER TABLE `tramos`
-  ADD CONSTRAINT `tramos_ibfk_1` FOREIGN KEY (`actividad_id`) REFERENCES `actividades` (`id`);
+  ADD CONSTRAINT `tramos_ibfk_1` FOREIGN KEY (`actividad_id`) REFERENCES `actividades` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `tramo_usuario`
 --
 ALTER TABLE `tramo_usuario`
-  ADD CONSTRAINT `tramo_usuario_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`),
-  ADD CONSTRAINT `tramo_usuario_ibfk_2` FOREIGN KEY (`tramo_id`) REFERENCES `tramos` (`id`);
+  ADD CONSTRAINT `tramo_usuario_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tramo_usuario_ibfk_2` FOREIGN KEY (`tramo_id`) REFERENCES `tramos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  ADD CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`rol_id`) REFERENCES `rol` (`id`);
+  ADD CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`rol_id`) REFERENCES `rol` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

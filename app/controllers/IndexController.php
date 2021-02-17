@@ -292,4 +292,9 @@ class IndexController extends BaseController
         }
         $this->view->show('RecordarPass', $parametros);
     }
+
+    public function instalar()
+    {
+        $this->view->show('Instalar');
+    }
 }
