@@ -635,7 +635,8 @@ class UserController extends BaseController
 
     public function imprimeListado()
     {
-        require 'vendor/autoload.php';
+        require VENDOR_FOLDER.'autoload.php';
+
         if ($_SESSION['rol_id'] == 0) {
             $parametros = [
             'tituloventana' => 'PDF Listado de usuarios',
