@@ -102,17 +102,12 @@ class UserController extends BaseController
         // verificamos que hemos recibido los parámetros desde la vista de listado
         if (isset($_GET['id']) && (is_numeric($_GET['id']))) {
             $id = $_GET['id'];
-            if ($_SESSION['id'] == $id) {
-                $this->mensajes[] = [
-                    'tipo' => 'danger',
-                    'mensaje' => 'No se ha podido eliminar.',
-                ];
-            } else {
-                //Realizamos la operación de suprimir el usuario con el id=$id
-                $resultModelo = $this->modelo->deluser($id);
-                //Analizamos el valor devuelto por el modelo para definir el mensaje a
-                //mostrar en la vista listado
-                if ($resultModelo['correcto']) :
+
+            //Realizamos la operación de suprimir el usuario con el id=$id
+            $resultModelo = $this->modelo->deluser($id);
+            //Analizamos el valor devuelto por el modelo para definir el mensaje a
+            //mostrar en la vista listado
+            if ($resultModelo['correcto']) :
             $this->mensajes[] = [
                'tipo' => 'success',
                'mensaje' => "Se eliminó correctamente el usuario $id",
@@ -121,8 +116,7 @@ class UserController extends BaseController
                'tipo' => 'danger',
                'mensaje' => "La eliminación del usuario no se realizó correctamente!! :( <br/>({$resultModelo['error']})",
             ];
-                endif;
-            }
+            endif;
         } else { //Si no recibimos el valor del parámetro $id generamos el mensaje indicativo:
             $this->mensajes[] = [
             'tipo' => 'danger',
@@ -262,6 +256,7 @@ class UserController extends BaseController
         // Array asociativo que almacenará los mensajes de error que se generen por cada campo
         $errores = [];
         // Inicializamos valores de los campos de texto
+
         $valnombre = '';
         $valnif = '';
         $valapellidos = '';
@@ -272,29 +267,47 @@ class UserController extends BaseController
         $valdireccion = '';
         $valrol_id = 3;
 
+        //dnd guardo el id!!!
+
         // Si se ha pulsado el botón actualizar...
       if (isset($_POST['submit'])) { //Realizamos la actualización con los datos existentes en los campos
-        $nuevonombre = filter_var($_POST['txtnombre'], FILTER_SANITIZE_STRING);
+          $id = $_POST['id'];
+          $nuevonombre = filter_var($_POST['txtnombre'], FILTER_SANITIZE_STRING);
           $nuevonif = filter_var($_POST['txtnif'], FILTER_SANITIZE_STRING);
           $nuevoapellidos = filter_var($_POST['txtapellidos'], FILTER_SANITIZE_STRING);
           $nuevoemail = filter_var($_POST['txtemail'], FILTER_SANITIZE_STRING);
+
           $nuevopassword = filter_var($_POST['txtpassword'], FILTER_SANITIZE_STRING);
           $nuevopassword2 = filter_var($_POST['txtpassword2'], FILTER_SANITIZE_STRING);
+
           $nuevotelefono = filter_var($_POST['txttelefono'], FILTER_SANITIZE_STRING);
           $nuevodireccion = filter_var($_POST['txtdireccion'], FILTER_SANITIZE_STRING);
           $nuevoimagen = '-';
           $nuevorol_id = $_POST['txtrol_id'];
 
-          $filtrardatos = [
+          if ($_POST['txtpassword'] != '' && $_POST['txtpassword2'] != '') {
+              $filtrardatos = [
+                'nif' => $nuevonif,
+                'email' => $nuevoemail,
+                'telefono' => $nuevotelefono,
+            ];
+          } else {
+              $filtrardatos = [
           'nif' => $nuevonif,
           'email' => $nuevoemail,
           'password' => $nuevopassword,
           'telefono' => $nuevotelefono,
       ];
+          }
 
           $errores = $this->modelo->filtraDatos($filtrardatos);
-          $errores += $this->modelo->existeEmail($nuevoemail);
-          $errores += $this->modelo->comparaPassword($nuevopassword, $nuevopassword2);
+          if ($this->modelo->listausuario($id)['datos']['email'] != $nuevoemail) {
+              $errores += $this->modelo->existeEmail($nuevoemail);
+          }
+          if ($_POST['txtpassword'] != '' && $_POST['txtpassword2'] != '') {
+              $errores += $this->modelo->comparaPassword($nuevopassword, $nuevopassword2);
+              $nuevopassword = sha1($nuevopassword);
+          }
 
           // Definimos la variable $imagen que almacenará el nombre de imagen
           // que almacenará la Base de Datos inicializada a NULL
@@ -334,7 +347,11 @@ class UserController extends BaseController
 
           //Ejecutamos la instrucción de actualización a la que le pasamos los valores
           if (count($errores) == 0) {
+              if (empty($nuevopassword)) {
+                  $nuevopassword = $this->modelo->listausuario($id)['datos']['password'];
+              }
               $resultModelo = $this->modelo->actuser([
+                  'id' => $id,
                  'nif' => $nuevonif,
                  'nombre' => $nuevonombre,
                  'apellidos' => $nuevoapellidos,
@@ -342,14 +359,14 @@ class UserController extends BaseController
                   'password' => $nuevopassword,
                   'telefono' => $nuevotelefono,
                   'direccion' => $nuevodireccion,
-                  'estado' => $nuevoestado,
                   'imagen' => $nuevoimagen,
                   'rol_id' => $nuevorol_id,
               ]);
               //Analizamos cómo finalizó la operación de registro y generamos un mensaje
               //indicativo del estado correspondiente
               if ($resultModelo['correcto']) :
-               $this->mensajes[] = [
+            //    $this->listado();
+              $this->mensajes[] = [
                   'tipo' => 'success',
                   'mensaje' => 'El usuario se actualizó correctamente!! :)',
                ]; else :
@@ -359,13 +376,15 @@ class UserController extends BaseController
                ];
               endif;
           } else {
-              $this->mensajes[] = [
-               'tipo' => 'danger',
-               'mensaje' => 'Datos de registro de usuario erróneos!! :(',
-            ];
+              foreach ($errores as $e) {
+                  $this->mensajes[] = [
+                        'tipo' => 'danger',
+                        'mensaje' => $e,
+                     ];
+              }
           }
 
-          // Obtenemos los valores para mostrarlos en los campos del formulario
+          //   // Obtenemos los valores para mostrarlos en los campos del formulario
           $valnombre = $nuevonombre;
           $valnif = $nuevonif;
           $valapellidos = $nuevoapellidos;
@@ -382,10 +401,10 @@ class UserController extends BaseController
               //Analizamos si la consulta se realiz´correctamente o no y generamos un
               //mensaje indicativo
               if ($resultModelo['correcto']) :
-               $this->mensajes[] = [
-                  'tipo' => 'success',
-                  'mensaje' => 'Los datos del usuario se obtuvieron correctamente!! :)',
-               ];
+                 $this->mensajes[] = [
+                    'tipo' => 'success',
+                    'mensaje' => 'Los datos del usuario se obtuvieron correctamente!! :)',
+                 ];
               $valnombre = $resultModelo['datos']['nombre'];
               $valnif = $resultModelo['datos']['nif'];
               $valapellidos = $resultModelo['datos']['apellidos'];
@@ -394,10 +413,10 @@ class UserController extends BaseController
               $valtelefono = $resultModelo['datos']['telefono'];
               $valdireccion = $resultModelo['datos']['direccion'];
               $valrol_id = $resultModelo['datos']['rol_id']; else :
-               $this->mensajes[] = [
-                  'tipo' => 'danger',
-                  'mensaje' => "No se pudieron obtener los datos de usuario!! :( <br/>({$resultModelo['error']})",
-               ];
+                 $this->mensajes[] = [
+                    'tipo' => 'danger',
+                    'mensaje' => "No se pudieron obtener los datos de usuario!! :( <br/>({$resultModelo['error']})",
+                 ];
               endif;
           }
       }
@@ -410,7 +429,7 @@ class UserController extends BaseController
             'txtnif' => $valnif,
                'txtapellidos' => $valapellidos,
                 'txtemail' => $valemail,
-                'txtpassword' => $valpassword,
+                'txtpassword' => '',
                 'txttelefono' => $valtelefono,
                 'txtdireccion' => $valdireccion,
                 // 'txtestado' => isset($estado) ? $estado : '',
@@ -418,7 +437,7 @@ class UserController extends BaseController
                  'txtrol_id' => $valrol_id,
          ],
          'mensajes' => $this->mensajes,
-        //  'id' => $id,
+          'id' => $id,
       ];
         //Mostramos la vista actuser
         $this->view->show('ActUser', $parametros);

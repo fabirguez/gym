@@ -295,18 +295,19 @@ class UserModel extends BaseModel
             $this->db->beginTransaction();
             //Definimos la instrucción SQL parametrizada
             $sql = 'UPDATE usuarios SET nif = :nif,nombre = :nombre,apellidos = :apellidos ,email = :email,
-                                    password = :password,telefono = :telefono,direccion = :direcion, imagen = :imagen, WHERE id = :id';
+                                    password = :password,telefono = :telefono,direccion = :direccion,imagen = :imagen, rol_id = :rol_id WHERE id = :id ';
             $query = $this->db->prepare($sql);
             $query->execute([
-                'id' => $this->id,
-                'nif' => $this->nif,
-                'nombre' => $this->nombre,
-                'apellidos' => $this->apellidos,
-                'email' => $this->email,
-                'password' => $this->password,
-                'telefono' => $this->telefono,
-                'direccion' => $this->direccion,
-                'imagen' => $this->imagen,
+                'id' => $datos['id'],
+                'nif' => $datos['nif'],
+                'nombre' => $datos['nombre'],
+                'apellidos' => $datos['apellidos'],
+                'email' => $datos['email'],
+                'password' => $datos['password'],
+                'telefono' => $datos['telefono'],
+                'direccion' => $datos['direccion'],
+                'imagen' => $datos['imagen'],
+                'rol_id' => $datos['rol_id'],
          ]);
             //Supervisamos si la inserción se realizó correctamente...
             if ($query) {
@@ -382,8 +383,10 @@ class UserModel extends BaseModel
         if (!filter_var($filtra['email'], FILTER_VALIDATE_EMAIL)) {
             $errores['email'] = 'Introduce un email correcto.';
         }
-        if (!preg_match('/^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,16}$/', $filtra['password'])) {
-            $errores['password'] = 'Introduce una contraseña con al menos un dígito, una minúscula y una mayúscula.';
+        if (array_key_exists('password', $errores)) {
+            if (!preg_match('/^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,16}$/', $filtra['password'])) {
+                $errores['password'] = 'Introduce una contraseña con al menos un dígito, una minúscula y una mayúscula.';
+            }
         }
         if (!preg_match('/^[679]{1}\d{8}$/', $filtra['telefono'])) {
             $errores['telefono'] = 'Introduce un telefono válido español.';

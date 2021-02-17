@@ -38,7 +38,7 @@
                <table class="table table-striped table-hover">
                   <thead class="thead-dark">
                      <tr>
-                        <td>ID</td>
+                        <!-- <td>ID</td> -->
                         <td>NIF</td>
                         <td>Nombre</td>
                         <td>Apellidos</td>
@@ -60,7 +60,7 @@
                      
                      
                            <tr>
-                           <td><?= $d['id']; ?></td>
+                           
                               <td><?= $d['nif']; ?></td>
                               <td><?= $d['nombre']; ?></td>
                               <td><?= $d['apellidos']; ?></td>

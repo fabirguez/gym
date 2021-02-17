@@ -53,7 +53,6 @@ class IndexController extends BaseController
                 $esActivo = $this->modelo->esActivo($_POST['txtemail']);
                 // if ($esActivo['correcto']) {
                 if ($tryLogin['datos']['estado'] == 1) {
-                    session_start();
                     $_SESSION['email'] = $_POST['txtemail'];
                     $parametros['email'] = $_POST['txtemail'];
 
@@ -230,9 +229,10 @@ class IndexController extends BaseController
             'datos' => null,
             'mensajes' => [],
          ];
-        session_start();
+
         session_unset();
         session_destroy();
+        session_start();
         $this->view->show('Index', $parametros);
     }
 }
