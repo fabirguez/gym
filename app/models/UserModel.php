@@ -383,7 +383,7 @@ class UserModel extends BaseModel
         if (!filter_var($filtra['email'], FILTER_VALIDATE_EMAIL)) {
             $errores['email'] = 'Introduce un email correcto.';
         }
-        if (array_key_exists('password', $errores)) {
+        if (array_key_exists('password', $filtra)) {
             if (!preg_match('/^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,16}$/', $filtra['password'])) {
                 $errores['password'] = 'Introduce una contraseña con al menos un dígito, una minúscula y una mayúscula.';
             }

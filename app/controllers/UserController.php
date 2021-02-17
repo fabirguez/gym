@@ -148,6 +148,11 @@ class UserController extends BaseController
     public function adduser()
     {
         if ($_SESSION['rol_id'] == 0) {
+            $parametros = [
+                'tituloventana' => 'Registro de usuario by admin',
+                'datos' => null,
+                'mensajes' => [],
+             ];
             // Array asociativo que almacenará los mensajes de error que se generen por cada campo
             $errores = [];
             // Si se ha pulsado el botón guardar...
@@ -161,8 +166,8 @@ class UserController extends BaseController
           $telefono = filter_var($_POST['txttelefono'], FILTER_SANITIZE_STRING);
           $direccion = filter_var($_POST['txtdireccion'], FILTER_SANITIZE_STRING);
           $imagen = '-';
-          $estado = 0;
-          $rol_id = 1;
+          $estado = $_POST['txtestado'];
+          $rol_id = $_POST['txtrol_id'];
           $filtrardatos = [
             'nif' => $nif,
             'email' => $email,
@@ -219,7 +224,7 @@ class UserController extends BaseController
                'nombre' => $nombre,
                'apellidos' => $apellidos,
                 'email' => $email,
-                'password' => $password,
+                'password' => sha1($password),
                 'telefono' => $telefono,
                 'direccion' => $direccion,
                 'estado' => $estado,
@@ -237,17 +242,18 @@ class UserController extends BaseController
                ];
               endif;
           } else {
-              $this->mensajes[] = [
-               'tipo' => 'danger',
-               'mensaje' => 'Datos de registro de usuario erróneos!! :(',
-            ];
+              foreach ($errores as $e) {
+                  $this->mensajes[] = [
+                    'tipo' => 'danger',
+                    'mensaje' => $e,
+                 ];
+              }
           }
       }
 
             $parametros = [
-         'tituloventana' => 'Registro de usuario',
+         'tituloventana' => 'Registro de usuario by administrador',
          'datos' => [
-            'txtnombre' => isset($nombre) ? $nombre : '',
             'txtnif' => isset($nif) ? $nif : '',
                'txtnombre' => isset($nombre) ? $nombre : '',
                'txtapellidos' => isset($apellidos) ? $apellidos : '',
@@ -255,9 +261,9 @@ class UserController extends BaseController
                 'txtpassword' => isset($password) ? $password : '',
                 'txttelefono' => isset($telefono) ? $telefono : '',
                 'txtdireccion' => isset($direccion) ? $direccion : '',
-                // 'txtestado' => isset($estado) ? $estado : '',
-                 'imagen' => isset($imagen) ? $imagen : '',
-                // 'rol_id' => isset($rol_id) ? $rol_id : 3,
+                'txtestado' => isset($estado) ? $estado : '',
+                'imagen' => isset($imagen) ? $imagen : '',
+                'rol_id' => isset($rol_id) ? $rol_id : 3,
          ],
          'mensajes' => $this->mensajes,
       ];
@@ -314,7 +320,7 @@ class UserController extends BaseController
           $nuevoimagen = '-';
           $nuevorol_id = $_POST['txtrol_id'];
 
-          if ($_POST['txtpassword'] != '' && $_POST['txtpassword2'] != '') {
+          if ($_POST['txtpassword'] == '' && $_POST['txtpassword2'] == '') {
               $filtrardatos = [
                 'nif' => $nuevonif,
                 'email' => $nuevoemail,

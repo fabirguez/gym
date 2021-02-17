@@ -12,7 +12,9 @@ spl_autoload_register(function ($nombre) {
 
 try {
     //Lo iniciamos con su método estático main.
+
     session_start();
+
     FrontController::main();
 } catch (\Exception $e) {
     echo $e->getMessage();
