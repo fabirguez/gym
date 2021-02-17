@@ -590,4 +590,36 @@ class UserModel extends BaseModel
 
         return $return;
     }
+
+    public function recordarPass($email, $password)
+    {
+        $return = [
+            'correcto' => false,
+            'error' => null,
+         ];
+
+        try {
+            //Inicializamos la transacción
+            $this->db->beginTransaction();
+            //Definimos la instrucción SQL parametrizada
+            $sql = 'UPDATE usuarios SET usuarios.estado = :estado, usuarios.password = :password WHERE usuarios.email = :email';
+            $query = $this->db->prepare($sql);
+            $query->execute([
+                   'email' => $email,
+                   'password' => $password,
+                   'estado' => '0',
+            ]);
+            //Supervisamos si la inserción se realizó correctamente...
+            if ($query) {
+                $this->db->commit();  // commit() confirma los cambios realizados durante la transacción
+                $return['correcto'] = true;
+            } // o no :(
+        } catch (PDOException $ex) {
+            $this->db->rollback(); // rollback() se revierten los cambios realizados durante la transacción
+            $return['error'] = $ex->getMessage();
+            //die();
+        }
+
+        return $return;
+    }
 }

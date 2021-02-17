@@ -234,4 +234,62 @@ class IndexController extends BaseController
         $_SESSION['rol_id'] = '4';
         $this->view->show('Index', $parametros);
     }
+
+    public function recordarPassword()
+    {
+        $parametros = [
+            'tituloventana' => 'Recordar contraseña',
+            'datos' => null,
+            'mensajes' => [],
+         ];
+
+        $errores = [];
+
+        if (isset($_POST['txtemail']) && isset($_POST['txtpassword']) && isset($_POST['txtpassword2'])) {
+            $filtrardatos = [
+                'email' => $_POST['txtemail'],
+                'password' => $_POST['txtpassword'],
+            ];
+
+            $errores = $this->modelo->filtraDatos($filtrardatos);
+
+            if (array_key_exists('email', $this->modelo->existeEmail($nuevoemail))) {
+                $errores += $this->modelo->existeEmail($nuevoemail);
+            }
+
+            $errores += $this->modelo->comparaPassword($nuevopassword, $nuevopassword2);
+
+            $recordarPass = $this->modelo->recordarPass($_POST['txtemail'], sha1($_POST['txtpassword']));
+
+            if ($recordarPass['correcto'] == true) {
+                $this->mensajes[] = [
+                'tipo' => 'success',
+                'mensaje' => 'Se ha cambiado. Contacta con el administrador para que te reactive la cuenta',
+             ];
+
+                $parametros['mensajes'] = $this->mensajes;
+            } else {
+                foreach ($errores as $e) {
+                    $this->mensajes[] = [
+                        'tipo' => 'danger',
+                        'mensaje' => $e,
+                     ];
+                }
+
+                $parametros['mensajes'] = $this->mensajes;
+                $this->view->show('RecordarPass', $parametros);
+            }
+        } else {
+            //Definimos el mensaje para el alert de la vista de que se produjeron errores
+            $this->mensajes[] = [
+                'tipo' => 'danger',
+                'mensaje' => 'Usuario y o contraseña vacios!! :( ',
+             ];
+
+            ///MIRARRRR!!!!
+            $parametros['mensajes'] = $this->mensajes;
+            $this->view->show('RecordarPass', $parametros);
+        }
+        $this->view->show('RecordarPass', $parametros);
+    }
 }
