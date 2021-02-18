@@ -1,11 +1,3 @@
-# gym
-
-Los usuarios creados automaticamente son: 
-admin@admin.es      //      admin
-socia@socia.es  //      Qwerty123
-
-https://still-ocean-31540.herokuapp.com/
-
 # Gimnasio
 
 _Acá va un párrafo que describa lo que es el proyecto_
