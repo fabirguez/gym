@@ -45,13 +45,6 @@ _Si ya habías entrado antes no hace falta hacer lo anterior_
 
 
 
-### Y las pruebas de estilo de codificación ⌨️
-
-_Explica que verifican estas pruebas y por qué_
-
-```
-Da un ejemplo
-```
 
 ## Despliegue 📦
 
