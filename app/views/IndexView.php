@@ -14,10 +14,12 @@
 </br></br></br>
          
 <?php
-          if ($_SESSION['rol_id'] == 0) {
-              echo '<h2> ADMINISTRADOR </h2>';
-          } elseif ($_SESSION['rol_id'] == 1) {
-              echo '<h2> USUARIO </h2>';
+          if (isset($_SESSION['rol_id']) && isset($_SESSION['email'])) {
+              if ($_SESSION['rol_id'] == 0) {
+                  echo '<h2> ADMINISTRADOR </h2>';
+              } elseif ($_SESSION['rol_id'] == 1) {
+                  echo '<h2> USUARIO </h2>';
+              }
           }
          ?>
         
